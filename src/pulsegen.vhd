@@ -7,8 +7,8 @@ entity pulse_gen is
     port (
         clk : in std_logic;
         output : out std_logic := '0';
-        length : in std_logic_vector (13 downto 0);
-        delay : in std_logic_vector (13 downto 0);
+        length : in std_logic_vector (7 downto 0);
+        delay : in std_logic_vector (7 downto 0);
         send  : in std_logic;
         stop  : in std_logic;
         resp  : out std_logic;
@@ -17,8 +17,8 @@ entity pulse_gen is
 end entity pulse_gen;
 
 architecture rtl of pulse_gen is
-    signal length_out : std_logic_vector (13 downto 0) := "00000000000000";
-    signal delay_out  : std_logic_vector (13 downto 0):= "00000000000000";
+    signal length_out : std_logic_vector (7 downto 0) := "00000000";
+    signal delay_out  : std_logic_vector (7 downto 0):= "00000000";
     type SM is (IDLE,SEND_pulse,WAIT_delay,RESPOND);
     signal STATE : SM := IDLE;
 
@@ -43,7 +43,7 @@ begin
                     when SEND_pulse =>
                         if length_out >= length then
                             state <= WAIT_delay;
-                            length_out <= "00000000000000";
+                            length_out <= "00000000";
                             output <= '0';
                         else
                             if length_out = std_logic_vector(unsigned(length)-1) then
@@ -55,9 +55,9 @@ begin
                         end if;
                     when WAIT_delay =>
                         resp <= '0';
-                        if delay_out = delay  then
+                        if delay_out >= delay  then
                             state <= RESPOND;
-                            delay_out <= "00000000000000";
+                            delay_out <= "00000000";
                         else
                             output <= '0';
                             STATE <= WAIT_delay;

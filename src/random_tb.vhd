@@ -40,14 +40,14 @@ begin
     clk <= not clk after CLK_PERIOD/2;
     process begin
         rst <= '1';
-        wait for 530 ns;
+        wait for 500 ns;
         rst <= '0';
         send <= '1';
-        wait for 530 ns;
+        wait for 500 ns;
         send <= '0';
         wait until done = '1';
         send <= '1';
-        wait for 530 ns;
+        wait for 500 ns;
         send <= '0';
         wait;
     end process;  
