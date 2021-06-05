@@ -1,36 +1,35 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-ENTITY prng IS
-  PORT (clk, rst,gen: IN std_logic;
-        output: OUT std_logic_vector (7 DOWNTO 0));
-END prng;
+entity prng is
+  port (
+    clk : in std_logic;
+    rst : in std_logic;
+    gen : in std_logic;
+    seed : in std_logic_vector (12 downto 0);
+    output : out std_logic_vector (12 downto 0)
+  );
+end prng;
 
-ARCHITECTURE rtl OF prng IS
-  SIGNAL currstate, nextstate: std_logic_vector (7 DOWNTO 0);
-  signal min : std_logic_vector(7 downto 0) := "00000010";
-  SIGNAL feedback: std_logic;
-BEGIN
+architecture rtl of prng is
+  signal currstate, nextstate : std_logic_vector (12 downto 0);
+  signal feedback : std_logic;
+begin
 
-  StateReg: PROCESS (clk,rst)
-  BEGIN
-    IF (rst = '1') THEN
-      currstate <= "00000010";
-    ELSIF rising_edge(clk)THEN
-    if nextstate < min then
-      currstate <= std_logic_vector(unsigned(nextstate) + unsigned(min));
-    else
-      currstate <= nextstate;
-    end if;  
-    END IF;
-  END PROCESS;
+  process (clk, rst)
+  begin
+    if (rst = '1') then
+      currstate <= seed;
+    elsif rising_edge(clk) then
+      if gen = '1' then
+        currstate <= nextstate;
+      end if;
+    end if;
+  end process;
 
-  
-      
-  
-  feedback <= currstate(4) XOR currstate(3) XOR currstate(2) XOR currstate(0);
-  nextstate <= feedback & currstate(7 DOWNTO 1);
+  feedback <= currstate(12) xnor currstate(3) xnor currstate(2) xnor currstate(0);
+  nextstate <= feedback & currstate(12 downto 1);
   output <= currstate;
 
-  end rtl;
+end rtl;
