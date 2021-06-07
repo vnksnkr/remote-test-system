@@ -5,7 +5,7 @@ use IEEE.numeric_std.all;
 entity prng is
   port (
     clk : in std_logic;
-    rst : in std_logic;
+    reset : in std_logic;
     gen : in std_logic;
     seed : in std_logic_vector (12 downto 0);
     output : out std_logic_vector (12 downto 0)
@@ -17,9 +17,9 @@ architecture rtl of prng is
   signal feedback : std_logic;
 begin
 
-  process (clk, rst)
+  process (clk, reset)
   begin
-    if (rst = '1') then
+    if (reset = '1') then
       currstate <= seed;
     elsif rising_edge(clk) then
       if gen = '1' then

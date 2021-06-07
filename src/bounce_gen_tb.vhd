@@ -12,12 +12,18 @@ architecture tb of bounce_generator_tb is
     signal input : std_logic;
     signal output : std_logic := '1';
     signal done : std_logic;
+    signal seed_duration : std_logic_vector(12 downto 0) := "0000000000111";
+    signal seed_length : std_logic_vector(12 downto 0) := "0000001111001";
+    signal seed_delay : std_logic_vector(12 downto 0) := "0000000001000";
 
     component bounce_generator
         port (
             reset : in std_logic;
             clk : in std_logic;
             input : in std_logic;
+            seed_duration : in std_logic_vector(12 downto 0) ;
+            seed_length   : in std_logic_vector(12 downto 0) ;
+            seed_delay    : in std_logic_vector(12 downto 0) ;
             output : out std_logic
         );
     end component;
@@ -28,6 +34,9 @@ begin
         reset => reset,
         clk => clk,
         input => input,
+        seed_duration => seed_duration,
+        seed_length => seed_length,
+        seed_delay => seed_delay,
         output => output
     );
 

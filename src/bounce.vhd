@@ -54,7 +54,7 @@ architecture rtl of bounce_generator is
     component prng
         port (
             clk : in std_logic;
-            rst : in std_logic;
+            reset : in std_logic;
             gen : in std_logic;
             seed : in std_logic_vector (12 downto 0);
             output : out std_logic_vector (12 downto 0)
