@@ -1,28 +1,13 @@
 v 4
-file . "controller_tb.vhd" "1c0201fc8811310d9bcc8d6057e8c2cc52e22a0c" "20210605162108.864":
-  entity controller_tb at 1( 0) + 0 on 165;
-  architecture tb of controller_tb at 8( 114) + 0 on 166;
-file . "tb_c.vhd" "ccf4f8ce0a60bbc89cde7149076858fe330a00aa" "20210605075509.258":
-  entity tb_c at 1( 0) + 0 on 121;
-  architecture tb of tb_c at 8( 96) + 0 on 122;
-file . "prng_v2.vhd" "51c3556ef1fca6e1be8f6641964a3f938473b9d1" "20210605112928.647":
-  entity prng_v2 at 1( 0) + 0 on 151;
-  architecture rtl of prng_v2 at 22( 455) + 0 on 152;
-file . "controller.vhd" "760cab70b3fe6a0b2f645cab63a737e04c5e0ff2" "20210605162102.672":
-  entity controller at 1( 0) + 0 on 163;
-  architecture rtl of controller at 19( 385) + 0 on 164;
-file . "pulsegen.vhd" "61c81a0eb9f89a30be1a8b56754fa8758c23639d" "20210605162044.879":
-  entity pulse_gen at 1( 0) + 0 on 159;
-  architecture rtl of pulse_gen at 18( 389) + 0 on 160;
-file . "PRNG.vhd" "807fa7448fb481df9de51d836f5d79688082f30c" "20210605162038.036":
-  entity prng at 1( 0) + 0 on 157;
-  architecture rtl of prng at 14( 291) + 0 on 158;
-file . "random_pulse_gen.vhd" "2d8261a387fba3152676098e210e8487f29c69c5" "20210605162055.737":
-  entity random_pulse_gen at 1( 0) + 0 on 161;
-  architecture rtl of random_pulse_gen at 17( 303) + 0 on 162;
-file . "random_tb.vhd" "10dc6f948c65b03be211e9a99f554ef3ff1766a3" "20210604025314.654":
-  entity random_tb at 1( 0) + 0 on 75;
-  architecture tb of random_tb at 8( 106) + 0 on 76;
-file . "controller_v2.vhd" "893cbc89a65d3fc2e54d3d8c37e2441ea5cd04fc" "20210605075506.666":
-  entity controller_v2 at 1( 0) + 0 on 119;
-  architecture rtl of controller_v2 at 19( 382) + 0 on 120;
+file . "bounce.vhd" "6deb90db000c24f849739e3704df1b32ad938891" "20210606150712.339":
+  entity bounce_generator at 1( 0) + 0 on 29;
+  architecture rtl of bounce_generator at 14( 257) + 0 on 30;
+file . "prng.vhd" "1e9bb4561e707fbaaba32043dff46fab96e66e31" "20210606150707.458":
+  entity prng at 1( 0) + 0 on 25;
+  architecture rtl of prng at 15( 276) + 0 on 26;
+file . "pulsegen.vhd" "de3aac7a8a1b5e745996f9011919ffd9ae8876b0" "20210606150710.110":
+  entity pulse_gen at 1( 0) + 0 on 27;
+  architecture rtl of pulse_gen at 16( 386) + 0 on 28;
+file . "bounce_gen_tb.vhd" "cb117c253daff2163c3b4dcf269b08226cabb8b8" "20210606150738.845":
+  entity bounce_generator_tb at 1( 0) + 0 on 31;
+  architecture tb of bounce_generator_tb at 8( 126) + 0 on 32;

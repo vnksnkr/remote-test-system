@@ -8,7 +8,7 @@ entity pulse_gen is
         length : in std_logic_vector (7 downto 0);
         delay : in std_logic_vector (7 downto 0);
         send : in std_logic;
-        stop : in std_logic;
+        reset : in std_logic;
         done : out std_logic
     );
 end entity pulse_gen;
@@ -26,7 +26,7 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            if stop = '1' then
+            if reset = '1' then
                 STATE <= IDLE;
             else
                 case STATE is
