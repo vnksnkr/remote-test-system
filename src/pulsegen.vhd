@@ -25,10 +25,9 @@ begin
 
     process (clk)
     begin
-        if rising_edge(clk) then
-            if reset = '1' then
+        if reset = '1' then
                 STATE <= IDLE;
-            else
+        elsif rising_edge(clk) then
                 case STATE is
                     when IDLE =>
 
@@ -69,7 +68,7 @@ begin
                         STATE <= IDLE;
 
                 end case;
-            end if;
+            
         end if;
     end process;
 

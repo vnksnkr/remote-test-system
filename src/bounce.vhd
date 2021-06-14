@@ -37,7 +37,11 @@ architecture rtl of bounce_generator is
     signal pulse_delay : std_logic_vector(12 downto 0) := (others => '0');
     signal pulse_gen_out : std_logic := '0';
 
-    ---seeds (need to be input port)---
+    --edge detection--
+    signal input_d: std_logic;
+    signal input_d_2 : std_logic;
+    signal input_fe : std_logic;
+
 
 
     component pulse_gen
@@ -103,18 +107,20 @@ begin
 
     process (clk, input, reset)
     begin
-        clkcnt <= clkcnt + 1;
+      
         if reset = '1' then
             STATE <= IDLE;
             clkcnt <= 0;
-        else
+        elsif rising_edge(clk) then
+			 clkcnt <= clkcnt + 1;
+            input_d <= input;
             case STATE is
                 when IDLE =>
-                    if rising_edge(input) then
+                    if input_d = '0' and input = '1' then
                         STATE <= LOAD;
                         clkcnt <= 0;
                         bounce_direction <= '1';
-                    elsif falling_edge(input) then
+                    elsif input_d = '1' and input = '0'  then
                         STATE <= LOAD;
                         clkcnt <= 0;
                         bounce_direction <= '0';
@@ -143,3 +149,4 @@ begin
         end if;
     end process;
 end rtl;
+
