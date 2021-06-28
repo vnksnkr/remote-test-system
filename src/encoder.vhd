@@ -7,7 +7,7 @@ entity encoder is
         clk : in std_logic;
         send : in std_logic;
         reset : in std_logic;
-        frequency_div : in std_logic_vector(15 downto 0) := (others => '0');
+        frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
         pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
         enc_A : out std_logic := '1';
         enc_B : out std_logic := '1';
@@ -16,12 +16,14 @@ entity encoder is
 end entity;
 
 architecture rtl of encoder is
-    signal shift_count : std_logic_vector(15 downto 0) := frequency_div;
-    signal phase_shift_count : std_logic_vector(15 downto 0) := (others => '0');
+    signal shift_count : std_logic_vector(21 downto 0);
+    signal phase_shift_count : std_logic_vector(21 downto 0) := (others => '0');
     signal r_enc_A : std_logic := '1';
     signal r_enc_B : std_logic := '1';
     signal send_B : std_logic := '0';
+
     signal done_A : std_logic := '0';
+	signal done_B : std_logic := '0';
     signal enc_A_d : std_logic;
 
     component signal_gen is
@@ -29,7 +31,7 @@ architecture rtl of encoder is
             clk : in std_logic;
             send : in std_logic;
             reset : in std_logic;
-            frequency_div : in std_logic_vector(15 downto 0) := (others => '0');
+            frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
             pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
             output : out std_logic := '1';
             done : out std_logic := '0'
@@ -37,8 +39,9 @@ architecture rtl of encoder is
     end component;
 begin
     
-    phase_shift_count(14 downto 0) <= frequency_div(15 downto 1);
+    phase_shift_count(20 downto 0) <= frequency_div(21 downto 1);
     enc_A <= r_enc_A;
+	done <= done_B;
     process(clk,reset)
     begin
         if reset = '1' then
@@ -51,7 +54,7 @@ begin
             if shift_count = phase_shift_count then
                 send_B <= '1';
                 shift_count <= std_logic_vector(unsigned(shift_count) + 1);
-            else
+            elsif done_B = '0' then
                 if enc_A_d = '1' and r_enc_A = '0' then
                     shift_count <= (others => '0');
                 else
@@ -82,7 +85,7 @@ begin
         frequency_div => frequency_div,
         pulse_no => pulse_no,
         output => enc_B,
-        done => done
+        done => done_B
     );
             
         

@@ -2,171 +2,132 @@ library ieee;
 use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 library machxo2;
-use machxo2.all;
+use machxo2.components.ALL;
 
 
 entity top is
 	port (
-		reset : in std_logic;
-		
-		enc : in std_logic;
-		button : in std_logic;
-		component_addr : in std_logic_vector(4 downto 0);
-		
-		frequency_div : in std_logic_vector(15 downto 0) := (others => '0');
-		pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
-        
-		seed_duration : in std_logic_vector(12 downto 0) ;
-		seed_length   : in std_logic_vector(12 downto 0) ;
-		seed_delay    : in std_logic_vector(12 downto 0) ;
-		
-
-		enc_B : out std_logic;
-		button_or_encA  : out std_logic;
-		done : out std_logic := '0'
-		
+	signals : out std_logic_vector (18 downto 0) := (others => '1')
 	);
-end entity;
+end top;
+
+architecture struct of top is
+
+
 	
-architecture rtl of top is
+signal	jtdi :  std_logic;
+signal	jtck :  std_logic;
+signal	jshift :  std_logic;
+signal	jrstn :  std_logic;
+signal	jupdate :  std_logic;
+signal	jce :  std_logic_vector(2 downto 1);
+signal	jtdo :  std_logic_vector(2 downto 1);
+signal	jrti :   std_logic_vector(2 downto 1);
+signal ready : std_logic;
+signal data : std_logic_vector(47 downto 0);
+signal jtag2dec  : std_logic;
+signal dec2jtag : std_logic;
 
-attribute NOM_FREQ : string;
-attribute NOM_FREQ of OSCinst0 : label is "2.56";
-signal button_clean : std_logic := '1';
-signal encA_clean : std_logic := '1';
-signal encB_clean : std_logic := '1';
-signal button_done : std_logic := '0';
-signal enc_done : std_logic := '0';
-signal osc_inst : std_logic;
-signal stdby_sed : std_logic;
-signal clk : std_logic;
-signal borenc_clean : std_logic := '1';
 
-
-component osch
-generic (NOM_FREQ: string := "2.56");
-port (STDBY : in std_logic;
-OSC : out std_logic ;
-SEDSTDBY : out std_logic);
+	
+component decoder is
+	generic (
+		SEED_COMMAND  : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', others => '0');
+		RESET_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 1 => '1', others => '0');
+		PARAM_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 2 => '1', others => '0')
+		-- NEXT_COMMAND  : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 2 => '1', 1 => '1', others => '0');
+		-- WAITING 	  : std_logic_vector(7 downto 0) :=  (0 => '0', 7 => '0', others => '1');
+		-- DONE_COMMAND  : std_logic_vector(7 downto 0) :=  (0 => '0', 7 => '0', 1 => '0', others => '1')
+	);
+	port (
+		data : in std_logic_vector(47 downto 0) ;
+		signals : out std_logic_vector (18 downto 0) := (others => '1');
+		-- response : out std_logic_vector (47 downto 0)
+        jtag2dec  : in std_logic := '0';
+        dec2jtag : out std_logic ;
+        ready : out std_logic := '1'
+	);
 end component;
 
-component signal_gen is
-    port (
-        clk : in std_logic;
-        send : in std_logic;
-        reset : in std_logic;
-        frequency_div : in std_logic_vector(15 downto 0) := (others => '0');
-        pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
-        output : out std_logic := '1';
-        done : out std_logic := '0'
-    );
-end component;
 
-component bounce_generator is
-    port (
-        reset : in std_logic;
-        clk   : in std_logic;
-        input : in std_logic;
-        seed_duration : in std_logic_vector(12 downto 0) ;
-        seed_length   : in std_logic_vector(12 downto 0) ;
-        seed_delay    : in std_logic_vector(12 downto 0) ;
-        output : out std_logic
+component jtag_ctrl is
+    port  (
+	
+		jtdi : in std_logic;
+		jtck : in std_logic;
+		jshift : in std_logic;
+		jrstn : in std_logic;
+		jupdate : in std_logic;
+		jce : in std_logic_vector(2 downto 1);
+		jtdo : out std_logic_vector(2 downto 1);
+		jrti :  in std_logic_vector(2 downto 1);
+		
+        dec2jtag : in std_logic;
+        jtag2dec : out std_logic := '0';
+        ready : in std_logic;
+        cmd  :  out std_logic_vector(47 downto 0)
     );
-end component;	
 
-
-component encoder is
-    port (
-        clk : in std_logic;
-        send : in std_logic;
-        reset : in std_logic;
-        frequency_div : in std_logic_vector(15 downto 0) := (others => '0');
-        pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
-        enc_A : out std_logic := '1';
-        enc_B : out std_logic := '1';
-        done : out std_logic := '0'
-    );
 end component;
 
 begin
-	
-	borenc_clean <= encA_clean and button_clean;
-	done <= button_done or enc_done;
-	
-	OSCinst0 : OSCH
+
+		
+    JTAGF_inst: JTAGF
 	generic map (
-	NOM_FREQ => "2.56")
-	
+	    ER1 => "ENABLED",
+	    ER2 => "ENABLED" )
 	port map (
-	STDBY => '0',OSC => clk ,SEDSTDBY => OPEN);
-	
-	signalinst0 : signal_gen 
+	    TCK => '0',
+	    TMS => '0',
+	    TDI => '0',
+	    TDO => open,
+	    --
+	    JTDI => jtdi,
+	    JTCK => jtck,
+	    --
+	    JSHIFT => jshift,
+	    JUPDATE => jupdate,
+	    JRSTN => jrstn,
+	    --
+	    JRTI1 => jrti(1),
+	    JRTI2 => jrti(2),
+	    --
+	    JTDO1 => jtdo(1),
+	    JTDO2 => jtdo(2),
+	    --
+	    JCE1 => jce(1),
+	    JCE2 => jce(2) );
+		
+	decoderinst : decoder
+	generic map (
+		SEED_COMMAND  =>  (0 => '1', 7 => '1', others => '0'),
+		RESET_COMMAND =>  (0 => '1', 7 => '1', 1 => '1', others => '0'),
+		PARAM_COMMAND =>  (0 => '1', 7 => '1', 2 => '1', others => '0')
+	)
 	port map (
-	clk => clk,
-	send => button,
-	reset => reset,
-	frequency_div => frequency_div,
-	pulse_no => pulse_no,
-	output => button_clean,
-	done => button_done
+	data => data,
+	signals => signals,
+	jtag2dec => jtag2dec,
+	dec2jtag => dec2jtag,
+	ready => ready
 	);
 	
-	encoderinst0 : encoder
+	
+	jtagctrlinst : jtag_ctrl
 	port map (
-	clk => clk,
-	send => enc,
-	reset => reset,
-	frequency_div => frequency_div,
-	pulse_no => pulse_no,
-	enc_A => encA_clean,
-	enc_B => encB_clean,
-	done => enc_done
+	jtdi => jtdi,
+	jtck => jtck,
+	jshift => jshift,
+	jrstn => jrstn,
+	jupdate => jupdate,
+	jce => jce,
+	jtdo => jtdo,
+	jrti => jrti,
+	dec2jtag => dec2jtag,
+	jtag2dec => jtag2dec,
+	ready => ready,
+	cmd => data
 	);
 	
-	bounceinst0 : bounce_generator
-	port map (
-	reset => reset,
-	clk => clk,
-	input => borenc_clean,
-	seed_duration => seed_duration,
-	seed_length => seed_length,
-	seed_delay => seed_delay,
-	output => button_or_encA
-	);
-	
-	bounceinst1 : bounce_generator
-	port map (
-	reset => reset,
-	clk => clk,
-	input => encB_clean,
-	seed_duration => seed_duration,
-	seed_length => seed_length,
-	seed_delay => seed_delay,
-	output => enc_B
-	);
-	
-
-end rtl;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
+end struct;

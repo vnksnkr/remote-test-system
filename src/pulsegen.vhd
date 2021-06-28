@@ -4,7 +4,7 @@ use IEEE.numeric_std.all;
 entity pulse_gen is
     port (
         clk : in std_logic;
-        output : out std_logic := '0';
+        output : out std_logic ;
         length : in std_logic_vector (7 downto 0);
         delay : in std_logic_vector (7 downto 0);
         send : in std_logic;
@@ -14,10 +14,10 @@ entity pulse_gen is
 end entity pulse_gen;
 
 architecture rtl of pulse_gen is
-    signal length_c : std_logic_vector (7 downto 0) := "00000000";
-    signal max_length : std_logic_vector (7 downto 0) := "00000000";
-    signal max_delay : std_logic_vector (7 downto 0) := "00000000";
-    signal delay_c : std_logic_vector (7 downto 0) := "00000000";
+    signal length_c : std_logic_vector (7 downto 0) := (others => '0');
+    signal max_length : std_logic_vector (7 downto 0) := (others => '0');
+    signal max_delay : std_logic_vector (7 downto 0) := (others => '0');
+    signal delay_c : std_logic_vector (7 downto 0) := (others => '0');
     type SM is (IDLE, SEND_pulse, WAIT_delay, RESPOND);
     signal STATE : SM := IDLE;
 
@@ -27,10 +27,11 @@ begin
     begin
         if reset = '1' then
                 STATE <= IDLE;
+				output <= '0';
         elsif rising_edge(clk) then
                 case STATE is
                     when IDLE =>
-
+						output <= '0';
                         done <= '0';
                         if send = '1' then
                             max_length <= length;
@@ -48,8 +49,8 @@ begin
                             length_c <= "00000000";
                             output <= '0';
                         else
-                            if length_c = std_logic_vector(unsigned(max_length) - 1) then
-                            end if;
+                            --if length_c = std_logic_vector(unsigned(max_length) - 1) then
+                            --end if;
                             output <= '1';
                             STATE <= SEND_pulse;
                             length_c <= std_logic_vector(unsigned(length_c) + 1);

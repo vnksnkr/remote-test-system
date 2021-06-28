@@ -7,7 +7,7 @@ entity signal_gen is
         clk : in std_logic;
         send : in std_logic;
         reset : in std_logic;
-        frequency_div : in std_logic_vector(15 downto 0) := (others => '0');
+        frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
         pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
         output : out std_logic := '1';
         done : out std_logic := '0'
@@ -30,15 +30,16 @@ begin
             clkcnt <= 0;
             pulse_count <= 0;
             STATE <= IDLE;
+			done <= '0';
         elsif rising_edge(clk) then
             case STATE is
                 when IDLE =>
-                done <= '0';
                 if send = '1' then
                     STATE <= SEND_pulse;
                     clkcnt <= 0;
                     pulse_count <= 0;
                     r_output <= '0';
+					done <= '0';
                 else
                     STATE <= IDLE;
                     r_output <= '1';

@@ -12,9 +12,9 @@ architecture tb of bounce_generator_tb is
     signal input : std_logic;
     signal output : std_logic := '1';
     signal done : std_logic;
-    signal seed_duration : std_logic_vector(12 downto 0) := "0000000000111";
+    signal seed_duration : std_logic_vector(12 downto 0) := "0000001000111";
     signal seed_length : std_logic_vector(12 downto 0) := "0000001111001";
-    signal seed_delay : std_logic_vector(12 downto 0) := "0000000001000";
+    signal seed_delay : std_logic_vector(12 downto 0) := "0001001111001";
 
     component bounce_generator
         port (
@@ -48,21 +48,29 @@ begin
         wait for 510 ns;
         reset <= '0';
         wait for 510 ns;
-        wait for 2000000 ns;
+        wait for 5000000 ns;
         input <= '0';
-        wait for 20000000 ns;
+        wait for 50000000 ns;
         input <= '1';
-        wait for 2000000 ns;
+        wait for 5000000 ns;
         input <= '0';
-        wait for 20000000 ns;
+        wait for 50000000 ns;
         input <= '1';
-        wait for 2000000 ns;
+        wait for 5000000 ns;
         input <= '0';
-        wait for 20000000 ns;
+        wait for 50000000 ns;
         input <= '1';
-        wait for 2000000 ns;
+        wait for 5000000 ns;
         input <= '0';
-        wait for 20000000 ns;
+        wait for 50000000 ns;
+        input <= '1';    
+        wait for 5000000 ns;
+        input <= '0';
+        wait for 50000000 ns;
+        input <= '1';    
+        wait for 5000000 ns;
+        input <= '0';
+        wait for 50000000 ns;
         input <= '1';        
     end process;
 end tb;
