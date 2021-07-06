@@ -7,8 +7,8 @@ entity encoder is
         clk : in std_logic;
         send : in std_logic;
         reset : in std_logic;
-        frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
-        pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
+        frequency_div : in std_logic_vector(21 downto 0);
+        pulse_no : in std_logic_vector(5 downto 0);
         enc_A : out std_logic := '1';
         enc_B : out std_logic := '1';
         done : out std_logic := '0'

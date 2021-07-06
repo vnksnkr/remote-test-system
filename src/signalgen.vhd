@@ -7,8 +7,8 @@ entity signal_gen is
         clk : in std_logic;
         send : in std_logic;
         reset : in std_logic;
-        frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
-        pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
+        frequency_div : in std_logic_vector(21 downto 0);
+        pulse_no : in std_logic_vector(5 downto 0);
         output : out std_logic := '1';
         done : out std_logic := '0'
     );
@@ -46,9 +46,9 @@ begin
                 end if;
 
                 when SEND_pulse =>
+
                     if pulse_count = unsigned(pulse_no)  then
                         STATE <= IDLE;
-                        done <= '1';
                     else
                         if clkcnt = unsigned(frequency_div)  then
                             clkcnt <= 0;
@@ -61,6 +61,9 @@ begin
                             r_output <= r_output;
                         end if;
                     end if;
+					if pulse_count = unsigned(pulse_no) then
+						done <= '1';
+					end if;
             end case;
         end if;
     end process;

@@ -30,8 +30,8 @@ architecture rtl of jtag_ctrl is
     signal jin : std_logic_vector(jreg'range);
 	signal jout : std_logic_vector(jreg'range);
 	
-    signal update_r : std_logic;
-    signal jtag2dec_r : std_logic;
+    signal update_r : std_logic := '0';
+    signal jtag2dec_r : std_logic:= '0';
     signal jsync1 : std_logic;
     signal jsync2 : std_logic;
     signal jsync_d : std_logic;
@@ -57,8 +57,9 @@ begin
         end if;
 
         elsif jupdate = '1' then
-        jout <= jreg;
-        jtag2dec_r <= not(jtag2dec_r);
+        if jreg(47 downto 41) = "1000001" then
+		jout <= jreg;
+        end if;
 
 
         elsif jrti(1) = '1' then	-- Run Test/Idle
@@ -82,14 +83,18 @@ begin
             if jsync_d = not(jsync2) then
                 jin <= (others => '1');
 			elsif jupdate = '1' then
+			if jreg(47 downto 41) = "1000001" then
 				jin <= (others => '0');
-			
             end if;
+			end if;
             if esync2 = '1' and update_r = '1' then
                 cmd <= jout;
+				jtag2dec_r <= not(jtag2dec_r);
+			end if;
             if esync2 = '1' and update_r = '1' then    
 				update_r <= '0';
 			elsif jupdate = '1' then
+			if jreg(47 downto 41) = "1000001" then	
 				update_r <= '1';
 			end if;
             end if;

@@ -33,6 +33,7 @@ architecture rtl of testbench is
         dec2jtag : out std_logic := '0';
         ready : out std_logic := '1'	);
 	end component;
+
 begin
 
 decoder_inst0 : decoder 

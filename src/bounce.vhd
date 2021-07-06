@@ -7,6 +7,7 @@ entity bounce_generator is
         reset : in std_logic;
         clk   : in std_logic;
         input : in std_logic;
+		is_enc: in std_logic;
 --        seed_duration : in std_logic_vector(12 downto 0) ;
         seed_length   : in std_logic_vector(12 downto 0) ;
 --        seed_delay    : in std_logic_vector(12 downto 0) ;
@@ -34,6 +35,7 @@ architecture rtl of bounce_generator is
     
     ---pulse parameters---
     signal random_length : std_logic_vector(12 downto 0) := (others => '0');
+	signal max_duration  : integer := 12;
     --signal pulse_delay : std_logic_vector(12 downto 0) := (others => '0');
     --signal pulse_gen_out : std_logic := '0';
 
@@ -69,6 +71,7 @@ architecture rtl of bounce_generator is
 begin
     output <= ((bounce_signal or input) and (not bounce_direction)) or((not(bounce_signal) and input) and (bounce_direction));
 	done <= done_r and bounce_direction; 
+	
 --    prng_bounce_duration : prng
 --    port map(
 --        clk => clk,
@@ -133,12 +136,17 @@ begin
                     end if;
                 when LOAD =>
                     clkcnt <= 0;
-                    bounce_duration <= random_length;
+					bounce_duration <= random_length;
+					if is_enc = '1' then
+						bounce_duration <= "000" & random_length(9 downto 0);
+					else
+						bounce_duration <= random_length;
+					end if;
                     STATE <= WAIT_to_LOAD;
                 when WAIT_to_LOAD =>
                     state <= BOUNCE;
                 when BOUNCE =>
-                    --load_bounce_interval <= '0';
+
                     if clkcnt >= unsigned(bounce_duration) then
                         STATE <= IDLE;
                         clkcnt <= 0;

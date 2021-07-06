@@ -9,14 +9,11 @@ entity decoder is
 		SEED_COMMAND  : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', others => '0');
 		RESET_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 1 => '1', others => '0');
 		PARAM_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 2 => '1', others => '0')
-		-- NEXT_COMMAND  : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 2 => '1', 1 => '1', others => '0');
-		-- WAITING 	  : std_logic_vector(7 downto 0) :=  (0 => '0', 7 => '0', others => '1');
-		-- DONE_COMMAND  : std_logic_vector(7 downto 0) :=  (0 => '0', 7 => '0', 1 => '0', others => '1')
 	);
 	port (
+		async_reset : in std_logic;
 		data : in std_logic_vector(47 downto 0) ;
 		signals : out std_logic_vector (18 downto 0) := (others => '1');
-		-- response : out std_logic_vector (47 downto 0)
         jtag2dec  : in std_logic := '0';
         dec2jtag : out std_logic ;
         ready : out std_logic := '1'
@@ -35,7 +32,6 @@ architecture rtl of decoder is
 
 	--output control--
 	
-	
 	signal terminal_addr : std_logic_vector (4 downto 0);
 	--signalgen and encoder--
 	signal send_signals : std_logic := '0';
@@ -48,6 +44,7 @@ architecture rtl of decoder is
 	signal reset_button : std_logic := '0';
 	signal reset_bounce : std_logic := '0';
 	
+	signal is_enc : std_logic;
     signal button_clean : std_logic := '1';
 	signal encA_clean : std_logic := '1';
 	signal encB_clean : std_logic := '1';
@@ -63,11 +60,11 @@ architecture rtl of decoder is
     signal button_or_encA : std_logic := '1';
 	signal enc_B : std_logic := '1';
 
-	type SM is (IDLE,DECODE,LOAD_SEED,LOAD_PARAM,SEND,WAIT_FOR_BOUNCE,RESET);
+	type SM is (IDLE,DECODE,LOAD_SEED,LOAD_PARAM,SEND,WAIT_FOR_BOUNCE,RESET,DELAY);
 	signal STATE : SM := IDLE;
 
-
-
+	signal delay_count : integer := 0;
+	
     signal jsync1 : std_logic := '0';
 	signal jsync2 : std_logic := '0';
 	signal jtag2dec_d : std_logic := '0';
@@ -93,8 +90,8 @@ architecture rtl of decoder is
 			clk : in std_logic;
 			send : in std_logic;
 			reset : in std_logic;
-			frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
-			pulse_no : in std_logic_vector(5 downto 0) := (others => '0');
+			frequency_div : in std_logic_vector(21 downto 0);
+			pulse_no : in std_logic_vector(5 downto 0);
 			output : out std_logic := '1';
 			done : out std_logic := '0'
 		);
@@ -105,6 +102,7 @@ architecture rtl of decoder is
 			reset : in std_logic;
 			clk : in std_logic;
 			input : in std_logic;
+			is_enc : in std_logic;
 			--seed_duration : in std_logic_vector(12 downto 0);
 			seed_length : in std_logic_vector(12 downto 0);
 			--seed_delay : in std_logic_vector(12 downto 0);
@@ -117,8 +115,8 @@ architecture rtl of decoder is
 			clk : in std_logic;
 			send : in std_logic;
 			reset : in std_logic;
-			frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
-			pulse_no : in std_logic_vector(5 downto 0) := (others => '0');
+			frequency_div : in std_logic_vector(21 downto 0);
+			pulse_no : in std_logic_vector(5 downto 0);
 			enc_A : out std_logic := '1';
 			enc_B : out std_logic := '1';
 			done : out std_logic := '0'
@@ -140,7 +138,7 @@ begin
 	button_or_encA_clean <= encA_clean and button_clean;
 	done <= button_done or enc_done;
 	dec2jtag <= dec2jtag_r;
-	
+	is_enc <= terminal_addr(4);
 	OSCinst0 : OSCH
 	generic map(
 		NOM_FREQ => "2.56")
@@ -186,6 +184,7 @@ begin
 		reset => reset_bounce,
 		clk => clk,
 		input => button_or_encA_clean,
+		is_enc => is_enc,
 --		seed_duration => seed_duration,
 		seed_length => seed_length,
 	--	seed_delay => seed_delay,
@@ -198,15 +197,18 @@ begin
 		reset => reset_bounce,
 		clk => clk,
 		input => encB_clean,
+		is_enc => '1',
 		--seed_duration => seed_duration,
 		seed_length => seed_length,
 		--seed_delay => seed_delay,
 		output => enc_B,
 		done => encB_bounce_done
 	);
-	process (clk)
+	process (clk,async_reset)
 	begin
-		if rising_edge(clk) then
+		if async_reset = '1' then
+			STATE <= RESET;
+		elsif rising_edge(clk) then
             jsync1 <= jtag2dec;
 			jsync2 <= jsync1;
 			jtag2dec_d <= jsync2;
@@ -247,8 +249,14 @@ begin
                     terminal_addr <= data_d(12 downto 8);
                     frequency_div <= data_d(34 downto 13);
                     pulse_no <= data_d(40 downto 35);
+					if data_d(40 downto 35) = "000000" then
+					STATE <= DELAY;
+					delay_count <= 0;
+					else
                     STATE <= SEND;
 					send_signals <= '1';
+					end if;
+					
 
                 when SEND =>
                     if done = '1' then
@@ -259,7 +267,7 @@ begin
                         push_button <= '0';
                     else
 						if send_signals = '1' then
-							turn_knob <= terminal_addr(4);
+							turn_knob <= terminal_addr(4); 
 							push_button <= not(terminal_addr(4));
 							send_signals <= '0';
 						else
@@ -283,7 +291,14 @@ begin
                     reset_button <= '1';
                     reset_encoder <= '1';
                     STATE <= IDLE;
-                
+				when DELAY =>
+					if delay_count = unsigned(frequency_div) then
+						STATE <= IDLE;
+						ready <= '1';
+					else
+						delay_count <= delay_count + 1;
+						STATE <= DELAY;
+					end if;
 			end case;
 		end if;
 	end process;
