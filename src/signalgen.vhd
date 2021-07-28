@@ -18,39 +18,39 @@ architecture rtl of signal_gen is
     signal clkcnt : integer := 0;
     signal pulse_count : integer := 0;
     signal r_output : std_logic := '1';
-    type SM is (IDLE,SEND_pulse);
+    type SM is (IDLE, SEND_pulse);
     signal STATE : SM := IDLE;
 
 begin
     output <= r_output;
-    process(clk,reset)
+    process (clk, reset)
     begin
         if reset = '1' then
             r_output <= '1';
             clkcnt <= 0;
             pulse_count <= 0;
             STATE <= IDLE;
-			done <= '0';
+            done <= '0';
         elsif rising_edge(clk) then
             case STATE is
                 when IDLE =>
-                if send = '1' then
-                    STATE <= SEND_pulse;
-                    clkcnt <= 0;
-                    pulse_count <= 0;
-                    r_output <= '0';
-					done <= '0';
-                else
-                    STATE <= IDLE;
-                    r_output <= '1';
-                end if;
+                    if send = '1' then
+                        STATE <= SEND_pulse;
+                        clkcnt <= 0;
+                        pulse_count <= 0;
+                        r_output <= '0';
+                        done <= '0';
+                    else
+                        STATE <= IDLE;
+                        r_output <= '1';
+                    end if;
 
                 when SEND_pulse =>
 
-                    if pulse_count = unsigned(pulse_no)  then
+                    if pulse_count = unsigned(pulse_no) then
                         STATE <= IDLE;
                     else
-                        if clkcnt = unsigned(frequency_div)  then
+                        if clkcnt = unsigned(frequency_div) then
                             clkcnt <= 0;
                             if r_output = '0' then
                                 pulse_count <= pulse_count + 1;
@@ -61,12 +61,10 @@ begin
                             r_output <= r_output;
                         end if;
                     end if;
-					if pulse_count = unsigned(pulse_no) then
-						done <= '1';
-					end if;
+                    if pulse_count = unsigned(pulse_no) then
+                        done <= '1';
+                    end if;
             end case;
         end if;
     end process;
-                    
-
 end rtl;
