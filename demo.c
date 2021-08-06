@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define NEW_VERSION 1
 
 	// DEVCFG0
 #pragma config BOOTISA = MIPS32
@@ -34,7 +35,11 @@
 #pragma config FPLLRNG = RANGE_5_10_MHZ
 #pragma config FPLLMULT = MUL_100
 #pragma config FPLLODIV = DIV_4
-//#pragma config UPLLEN = OFF
+
+#if NEW_VERSION == 0
+#pragma config UPLLEN = OFF
+#endif
+
 #pragma config UPLLFSEL = FREQ_24MHZ
 
 	// DEVCFG3
@@ -48,7 +53,6 @@
 	// DEVCP0
 #pragma config CP = OFF
 
-#define NEW_VERSION 1
 
 #define ICSP_W_MCLR_O	LATCbits.LATC13
 #define ICSP_W_MCLR_T	TRISCbits.TRISC13
@@ -147,17 +151,17 @@ void	init_i2c_e(void)
 	ICSP_E_PCLK_U = 1;
 	ICSP_E_PDAT_U = 1;
 
-	I2C2BRG = 128;
+	I2C5BRG = 128;
 
-	I2C2ADD = 0xFF;
-	I2C2MSK = 0xFF;
+	I2C5ADD = 0xFF;
+	I2C5MSK = 0xFF;
 	
 	ICSP_E_PDAT_O = 0;		// clear SDA
 	ICSP_E_PDAT_T = 0;		// SDA to out
 	ICSP_E_PCLK_O = 1;		// set SCL
 	ICSP_E_PCLK_T = 1;		// SCL to in
 
-	I2C2CONbits.ON = 1;
+	I2C5CONbits.ON = 1;
 }
 
 void	init_i2c_w(void)
@@ -224,11 +228,11 @@ void	init_uart2(void)
 
 
 static inline
-uint8_t	i2c2_start(void)
+uint8_t	i2c5_start(void)
 {
-	I2C2CONbits.SEN = 1;		// Send Start
-	while (I2C2CONbits.SEN);
-	return I2C2STAT & 0xFF;
+	I2C5CONbits.SEN = 1;		// Send Start
+	while (I2C5CONbits.SEN);
+	return I2C5STAT & 0xFF;
 }
 
 static inline
@@ -240,11 +244,11 @@ uint8_t	i2c3_start(void)
 }
 
 static inline
-uint8_t	i2c2_restart(void)
+uint8_t	i2c5_restart(void)
 {
-	I2C2CONbits.RSEN = 1;		// Send Restart
-	while (I2C2CONbits.RSEN);
-	return I2C2STAT & 0xFF;
+	I2C5CONbits.RSEN = 1;		// Send Restart
+	while (I2C5CONbits.RSEN);
+	return I2C5STAT & 0xFF;
 }
 
 static inline
@@ -258,14 +262,14 @@ uint8_t	i2c3_restart(void)
 
 #if	0
 static inline
-uint8_t	i2c2_stop(void)
+uint8_t	i2c5_stop(void)
 {
-	if ((I2C2CON & 0x1F) == 0)
-	    I2C2CONbits.PEN = 1;	// Send Stop
-	return I2C2CON & 0x1F;
+	if ((I2C5CON & 0x1F) == 0)
+	    I2C5CONbits.PEN = 1;	// Send Stop
+	return I2C5CON & 0x1F;
 }
 #else
-#define i2c2_stop i2c2_bb_stop
+#define i2c5_stop i2c5_bb_stop
 #endif
 
 
@@ -290,14 +294,14 @@ void	i2c_bb_delay(unsigned cnt)
 }
 
 static inline
-void	i2c2_bb_stop(void)
+void	i2c5_bb_stop(void)
 {
 	i2c_bb_delay(1);
-	I2C2CONbits.ON = 0;		// disable I2C
+	I2C5CONbits.ON = 0;		// disable I2C
 	i2c_bb_delay(1);
 	ICSP_E_PDAT_T = 1;		// SDA to input
 	i2c_bb_delay(2);
-	I2C2CONbits.ON = 1;		// enable I2C
+	I2C5CONbits.ON = 1;		// enable I2C
 	ICSP_E_PDAT_O = 0;		// clear SDA
 	ICSP_E_PDAT_T = 0;		// SDA to out
 	ICSP_E_PCLK_O = 1;		// set SCL
@@ -321,11 +325,11 @@ void	i2c3_bb_stop(void)
 
 
 static inline
-bool	i2c2_write(uint8_t byte)
+bool	i2c5_write(uint8_t byte)
 {
-	I2C2TRN = byte;
-	while (I2C2STATbits.TRSTAT);
-	return I2C2STATbits.ACKSTAT;
+	I2C5TRN = byte;
+	while (I2C5STATbits.TRSTAT);
+	return I2C5STATbits.ACKSTAT;
 }
 
 static inline
@@ -337,21 +341,21 @@ bool	i2c3_write(uint8_t byte)
 }
 
 static inline
-uint8_t	i2c2_read(bool ackdt)
+uint8_t	i2c5_read(bool ackdt)
 {
-	while (I2C2STATbits.RBF)
-	    (void)I2C2RCV;
-	if (I2C2CON & 0x1F)
+	while (I2C5STATbits.RBF)
+	    (void)I2C5RCV;
+	if (I2C5CON & 0x1F)
 	    return 0xFF;
 
-	I2C2CONbits.RCEN = 1;
-	while (!I2C2STATbits.RBF);
+	I2C5CONbits.RCEN = 1;
+	while (!I2C5STATbits.RBF);
 
-	I2C2CONbits.ACKDT = ackdt;
-	I2C2CONbits.ACKEN = 1;
-	while (I2C2CONbits.ACKEN);
+	I2C5CONbits.ACKDT = ackdt;
+	I2C5CONbits.ACKEN = 1;
+	while (I2C5CONbits.ACKEN);
 
-	return I2C2RCV;
+	return I2C5RCV;
 }
 
 static inline
@@ -457,50 +461,50 @@ void __attribute__((vector(_UART2_RX_VECTOR), interrupt(IPL7SRS))) uart2_isr(voi
 }
 
 
-uint8_t	i2c2_get(uint8_t idx)
+uint8_t	i2c5_get(uint8_t idx)
 {
 	uint8_t val;
 
-	i2c2_start();
-	i2c2_write(0x20);
-	i2c2_write(idx);
-	i2c2_restart();
-	i2c2_write(0x21);
-	val = i2c2_read(1);
-	i2c2_stop();	
+	i2c5_start();
+	i2c5_write(0x20);
+	i2c5_write(idx);
+	i2c5_restart();
+	i2c5_write(0x21);
+	val = i2c5_read(1);
+	i2c5_stop();	
 
 	return val;
 }
 
-void	i2c2_set(uint8_t idx, uint8_t val)
+void	i2c5_set(uint8_t idx, uint8_t val)
 {
-	i2c2_start();
-	i2c2_write(0x20);
-	i2c2_write(idx);
-	i2c2_write(val);
-	i2c2_stop();	
+	i2c5_start();
+	i2c5_write(0x20);
+	i2c5_write(idx);
+	i2c5_write(val);
+	i2c5_stop();	
 }
 
-void	i2c2_getn(uint8_t idx, uint8_t *data, uint8_t n)
+void	i2c5_getn(uint8_t idx, uint8_t *data, uint8_t n)
 {
-	i2c2_start();
-	i2c2_write(0x20);
-	i2c2_write(idx);
-	i2c2_restart();
-	i2c2_write(0x21);
+	i2c5_start();
+	i2c5_write(0x20);
+	i2c5_write(idx);
+	i2c5_restart();
+	i2c5_write(0x21);
 	while (n--)
-	    *data++ = i2c2_read(n == 0);
-	i2c2_stop();	
+	    *data++ = i2c5_read(n == 0);
+	i2c5_stop();	
 }
 
-void	i2c2_setn(uint8_t idx, uint8_t *data, uint8_t n)
+void	i2c5_setn(uint8_t idx, uint8_t *data, uint8_t n)
 {
-	i2c2_start();
-	i2c2_write(0x20);
-	i2c2_write(idx);
+	i2c5_start();
+	i2c5_write(0x20);
+	i2c5_write(idx);
 	while (n--)
-	    i2c2_write(*data++);
-	i2c2_stop();	
+	    i2c5_write(*data++);
+	i2c5_stop();	
 }
 
 
@@ -575,16 +579,20 @@ int	main(void)
 	static uint32_t timeout = 0;
 
 
+
+
 	init_pbus();
 	init_icsp_w();
 	init_icsp_e();
 	init_uart2();
 
+
+
 	init_i2c_w();
 	init_i2c_e();
 
 	delay(1000);
-	uart2_str0("\f\n\rAXIOM Remote Demo v0.1\n\r");
+//	uart2_str0("\f\n\rAXIOM Remote Demo v0.1\n\r");
 
 	delay(1000);
 	set_mclr_w(1);
@@ -592,20 +600,34 @@ int	main(void)
 
 	delay(1000);
 
+	i2c3_write(0x20);
+	i2c3_val = i2c3_read(1);
+	uart2_str0("\f\n\rAXIOM Remote Demo v0.1 -> %d \n\r",i2c3_val);
+
+	i2c5_write(0x23);
+	i2c5_val = i2c3_read(1);
+	uart2_str0("\f\n\rAXIOM Remote Demo v0.1 -> %d \n\r",i2c5_val);
+
+
+
 	rgb[0] = 0x18;
 	rgb[1] = 0x28;
 	rgb[2] = 0x38;
 	rgb[3] = 0x01;
 	i2c3_setn(0x20, rgb, 4);
-
+	uart2_str0("set RGB");
 	qe[0] = 0x0;
 	qe[1] = 0x0;
 
+	while(1) {
+		i2c3_setn(0x20, rgb, 4);
+	}
 
 	while (1) {
 	    // asm volatile("wait");
+		
 
-	    i2c2_getn(0x00, data, 3);
+	    i2c5_getn(0x00, data, 3);
 
 	    if (data[0] || data[1] || data[2]) {
 		uart2_byte(data[0]);

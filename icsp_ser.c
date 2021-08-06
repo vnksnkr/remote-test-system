@@ -9,13 +9,12 @@
 **
 */
 
-
 #include <xc.h>
 #include <stdint.h>
 #include <stdbool.h>
 
+#define NEW_VERSION 1
 
-#define NEW_VERSION  1
 	// DEVCFG0
 #pragma config BOOTISA = MIPS32
 #pragma config ICESEL = ICS_PGx1
@@ -83,25 +82,25 @@ static uint32_t hexdat = 0;
 #define ICSP_E_MCLR_O	LATCbits.LATC14
 #define ICSP_E_MCLR_T	TRISCbits.TRISC14
 
-
 #if NEW_VERSION 
 #define	ICSP_E_PCLK_O	LATFbits.LATF5
 #define	ICSP_E_PCLK_T	TRISFbits.TRISF5
 #define	ICSP_E_PCLK_U	CNPUFbits.CNPUF5
+
 #define	ICSP_E_PDAT_O	LATFbits.LATF4
 #define ICSP_E_PDAT_I	PORTFbits.RF4
 #define ICSP_E_PDAT_T	TRISFbits.TRISF4
 #define ICSP_E_PDAT_U	CNPUFbits.CNPUF4
-#else
 
+#else
 #define	ICSP_E_PCLK_O	LATAbits.LATA2
 #define	ICSP_E_PCLK_T	TRISAbits.TRISA2
 #define	ICSP_E_PCLK_U	CNPUAbits.CNPUA2
+
 #define	ICSP_E_PDAT_O	LATAbits.LATA3
 #define ICSP_E_PDAT_I	PORTAbits.RA3
 #define ICSP_E_PDAT_T	TRISAbits.TRISA3
 #define ICSP_E_PDAT_U	CNPUAbits.CNPUA3
-
 #endif
 
 
@@ -163,7 +162,7 @@ void	init_icsp_e(void)
 	ICSP_E_PCLK_T = 0;		// PCLK out
 	ICSP_E_PDAT_T = 0;		// PDAT out
 
-	I2C2CONbits.ON = 0;		// disable I2C
+	I2C5CONbits.ON = 0;		// disable I2C
 }
 
 
@@ -172,17 +171,17 @@ void	init_i2c_e(void)
 	ICSP_E_PCLK_U = 1;
 	ICSP_E_PDAT_U = 1;
 
-	I2C2BRG = 128;
+	I2C5BRG = 128;
 
-	I2C2ADD = 0xFF;
-	I2C2MSK = 0xFF;
+	I2C5ADD = 0xFF;
+	I2C5MSK = 0xFF;
 	
 	ICSP_E_PDAT_O = 0;		// clear SDA
 	ICSP_E_PDAT_T = 0;		// SDA to out
 	ICSP_E_PCLK_O = 1;		// set SCL
 	ICSP_E_PCLK_T = 1;		// SCL to in
 
-	I2C2CONbits.ON = 1;
+	I2C5CONbits.ON = 1;
 }
 
 void	init_i2c_w(void)
@@ -249,11 +248,11 @@ void	init_uart2(void)
 
 
 static inline
-uint8_t	i2c2_start(void)
+uint8_t	i2c5_start(void)
 {
-	I2C2CONbits.SEN = 1;		// Send Start
-	while (I2C2CONbits.SEN);
-	return I2C2STAT & 0xFF;
+	I2C5CONbits.SEN = 1;		// Send Start
+	while (I2C5CONbits.SEN);
+	return I2C5STAT & 0xFF;
 }
 
 static inline
@@ -265,11 +264,11 @@ uint8_t	i2c3_start(void)
 }
 
 static inline
-uint8_t	i2c2_restart(void)
+uint8_t	i2c5_restart(void)
 {
-	I2C2CONbits.RSEN = 1;		// Send Restart
-	while (I2C2CONbits.RSEN);
-	return I2C2STAT & 0xFF;
+	I2C5CONbits.RSEN = 1;		// Send Restart
+	while (I2C5CONbits.RSEN);
+	return I2C5STAT & 0xFF;
 }
 
 static inline
@@ -282,11 +281,11 @@ uint8_t	i2c3_restart(void)
 
 
 static inline
-uint8_t	i2c2_stop(void)
+uint8_t	i2c5_stop(void)
 {
-	if ((I2C2CON & 0x1F) == 0)
-	    I2C2CONbits.PEN = 1;	// Send Stop
-	return I2C2CON & 0x1F;
+	if ((I2C5CON & 0x1F) == 0)
+	    I2C5CONbits.PEN = 1;	// Send Stop
+	return I2C5CON & 0x1F;
 }
 
 
@@ -307,14 +306,14 @@ void	i2c_bb_delay(unsigned cnt)
 }
 
 static inline
-void	i2c2_bb_stop(void)
+void	i2c5_bb_stop(void)
 {
 	i2c_bb_delay(1);
-	I2C2CONbits.ON = 0;		// disable I2C
+	I2C5CONbits.ON = 0;		// disable I2C
 	i2c_bb_delay(1);
 	ICSP_E_PDAT_T = 1;		// SDA to input
 	i2c_bb_delay(2);
-	I2C2CONbits.ON = 1;		// enable I2C
+	I2C5CONbits.ON = 1;		// enable I2C
 	ICSP_E_PDAT_O = 0;		// clear SDA
 	ICSP_E_PDAT_T = 0;		// SDA to out
 	ICSP_E_PCLK_O = 1;		// set SCL
@@ -338,11 +337,11 @@ void	i2c3_bb_stop(void)
 
 
 static inline
-bool	i2c2_write(uint8_t byte)
+bool	i2c5_write(uint8_t byte)
 {
-	I2C2TRN = byte;
-	while (I2C2STATbits.TRSTAT);
-	return I2C2STATbits.ACKSTAT;
+	I2C5TRN = byte;
+	while (I2C5STATbits.TRSTAT);
+	return I2C5STATbits.ACKSTAT;
 }
 
 static inline
@@ -354,21 +353,21 @@ bool	i2c3_write(uint8_t byte)
 }
 
 static inline
-uint8_t	i2c2_read(bool ackdt)
+uint8_t	i2c5_read(bool ackdt)
 {
-	while (I2C2STATbits.RBF)
-	    (void)I2C2RCV;
-	if (I2C2CON & 0x1F)
+	while (I2C5STATbits.RBF)
+	    (void)I2C5RCV;
+	if (I2C5CON & 0x1F)
 	    return 0xFF;
 
-	I2C2CONbits.RCEN = 1;
-	while (!I2C2STATbits.RBF);
+	I2C5CONbits.RCEN = 1;
+	while (!I2C5STATbits.RBF);
 
-	I2C2CONbits.ACKDT = ackdt;
-	I2C2CONbits.ACKEN = 1;
-	while (I2C2CONbits.ACKEN);
+	I2C5CONbits.ACKDT = ackdt;
+	I2C5CONbits.ACKEN = 1;
+	while (I2C5CONbits.ACKEN);
 
-	return I2C2RCV;
+	return I2C5RCV;
 }
 
 static inline
@@ -490,7 +489,7 @@ void	uart2_ch(char ch)
 
 static inline
 void	uart2_hex(uint8_t hex)
-{icsp_ser.c:(.vector_146+0x0): undefined reference to `uart2_isr'
+{
 	hex &= 0xF;
 	if (hex > 9)
 	    uart2_ch(hex + 'A' - 10);
@@ -609,7 +608,7 @@ void __attribute__((vector(_UART2_RX_VECTOR), interrupt(IPL7SRS))) uart2_isr(voi
 
 		case 'S':		// I2C Start
 		    if (sel)
-			hexdat = i2c2_start();
+			hexdat = i2c5_start();
 		    else
 			hexdat = i2c3_start();
 		    uart2_ch(ch);	// echo back
@@ -618,7 +617,7 @@ void __attribute__((vector(_UART2_RX_VECTOR), interrupt(IPL7SRS))) uart2_isr(voi
 
 		case 's':		// I2C Retart
 		    if (sel)
-			hexdat = i2c2_restart();
+			hexdat = i2c5_restart();
 		    else
 			hexdat = i2c3_restart();
 		    uart2_ch(ch);	// echo back
@@ -627,7 +626,7 @@ void __attribute__((vector(_UART2_RX_VECTOR), interrupt(IPL7SRS))) uart2_isr(voi
 
 		case 'P':		// I2C Stop
 		    if (sel)
-			i2c2_bb_stop();
+			i2c5_bb_stop();
 		    else
 			i2c3_bb_stop();
 		    uart2_ch(ch);	// echo back
@@ -635,7 +634,7 @@ void __attribute__((vector(_UART2_RX_VECTOR), interrupt(IPL7SRS))) uart2_isr(voi
 
 		case 'W':
 		    if (sel)
-			hexdat = i2c2_write(hexval);
+			hexdat = i2c5_write(hexval);
 		    else
 			hexdat = i2c3_write(hexval);
 		    uart2_ch(ch);	// echo back
@@ -645,7 +644,7 @@ void __attribute__((vector(_UART2_RX_VECTOR), interrupt(IPL7SRS))) uart2_isr(voi
 
 		case 'R':
 		    if (sel)
-			hexdat = i2c2_read(hexval);
+			hexdat = i2c5_read(hexval);
 		    else
 			hexdat = i2c3_read(hexval);
 		    uart2_ch(ch);	// echo back
