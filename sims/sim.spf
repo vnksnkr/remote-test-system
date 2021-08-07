@@ -1,0 +1,15 @@
+<BaliSimProject version="1.3" path="." stage="0" language="-1" name="sim" simType="ModelSim">
+    <Source worklib="work" path="JTAG_TEST/pulsegen.vhd" type="VHDL" include="none"/>
+    <Source worklib="work" path="JTAG_TEST/prng.vhd" type="VHDL" include="none"/>
+    <Source worklib="work" path="JTAG_TEST/bounce.vhd" type="VHDL" include="none"/>
+    <Source worklib="work" path="JTAG_TEST/signalgen.vhd" type="VHDL" include="none"/>
+    <Source worklib="work" path="JTAG_TEST/encoder.vhd" type="VHDL" include="none"/>
+    <Source worklib="work" path="JTAG_TEST/demux.vhd" type="VHDL" include="none"/>
+    <Source worklib="work" path="JTAG_TEST/decoder.vhd" type="VHDL" include="none"/>
+    <Source worklib="work" path="JTAG_TEST/top.vhd" type="VHDL" include="none"/>
+    <Source worklib="work" path="JTAG_TEST/top_tb.vhd" type="VHDL" include="none"/>
+    <SimLib value="pmi_work ovi_machxo2"/>
+    <GlbInc value=""/>
+    <Macro value=""/>
+    <TopModule instance="" language="VHDL" name="top_tb"/>
+</BaliSimProject>
