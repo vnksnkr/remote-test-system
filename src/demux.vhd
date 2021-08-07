@@ -13,28 +13,33 @@ end entity;
 
 architecture rtl of demux is
 
+signal not_a : std_logic := '0';
+signal not_b : std_logic:= '0';
 begin
+	not_a <= not(input_A);
+	not_b <= not(input_A);
+	
     with addr select output <=
-        (0 => input_A,others => '1') when "00000",
-        (1 => input_A,others => '1') when "00001",
-        (2 => input_A,others => '1') when "00010",
-        (3 => input_A,others => '1') when "00011",
-        (4 => input_A,others => '1') when "00100",
-        (5 => input_A,others => '1') when "00101",
-        (6 => input_A,others => '1') when "00110",
-        (7 => input_A,others => '1') when "00111",
-        (8 => input_A,others => '1') when "01000",
-        (9 => input_A,others => '1') when "01001",
-        (10 => input_A,others => '1') when "01010",
-        (11 => input_A,others => '1') when "01011",
-        (12 => input_A,others => '1') when "01100",
-        (13 => input_A,14 =>input_B,others => '1') when  "10000",
-        (13 => input_B,14 => input_A,others => '1') when "10001",
-        (15 => input_A,others => '1') when "01101",
-        (16 => input_A,17 => input_B,others => '1') when "10010",
-        (16 => input_B,17 => input_A,others => '1') when "10011",
-        (18 => input_A,others => '1') when "01110",
-        (others => '1') when others;
+        (0 => not_a,others => '0') when "00000",
+        (1 => not_a,others => '0') when "00001",
+        (2 => not_a,others => '0') when "00010",
+        (3 => not_a,others => '0') when "00011",
+        (4 => not_a,others => '0') when "00100",
+        (5 => not_a,others => '0') when "00101",
+        (6 => not_a,others => '0') when "00110",
+        (7 => not_a,others => '0') when "00111",
+        (8 => not_a,others => '0') when "01000",
+        (9 => not_a,others => '0') when "01001",
+        (10 => not_a,others => '0') when "01010",
+        (11 => not_a,others => '0') when "01011",
+        (12 => not_a,others => '0') when "01100",
+        (13 => not_a,14 =>not_b,others => '0') when  "10000",
+        (13 => not_b,14 => not_a,others => '0') when "10001",
+        (15 => not_a,others => '0') when "01101",
+        (16 => not_a,17 => not_b,others => '0') when "10010",
+        (16 => not_b,17 => not_a,others => '0') when "10011",
+        (18 => not_a,others => '1') when "01110",
+        (others => '0') when others;
 end rtl;
 
 
