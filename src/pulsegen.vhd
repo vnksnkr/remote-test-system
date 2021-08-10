@@ -49,8 +49,6 @@ begin
                             length_c <= "00000000";
                             output <= '0';
                         else
-                            --if length_c = std_logic_vector(unsigned(max_length) - 1) then
-                            --end if;
                             output <= '1';
                             STATE <= SEND_pulse;
                             length_c <= std_logic_vector(unsigned(length_c) + 1);

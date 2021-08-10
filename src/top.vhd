@@ -7,21 +7,18 @@ use machxo2.components.ALL;
 
 entity top is
 	port (
+	
 	--simulation--
 --	tck : in std_logic;
 --	tms : in std_logic;
 --	tdi : in std_logic;
 --	tdo : out std_logic;
---	jtdo1 : out std_logic;
-	--------------
---	clk : in std_logic;
---	reset : in std_logic;
 	mclr : out std_logic := '0';
-	reset_led : out std_logic := '1';
-	seed_led : out std_logic := '1';
-	send_led : out std_logic := '1';
 	delay_led : out std_logic := '1';
-	signals : out std_logic_vector (18 downto 0) := (others => '1')
+	shld_buttons  : out std_logic_vector(12 downto 0);
+	shld_encA    :  out std_logic_vector(1 downto 0);
+	shld_encB    :  out std_logic_vector(1 downto 0);
+	shld_encS    :  out std_logic_vector(1 downto 0)
 	);
 end top;
 
@@ -39,7 +36,7 @@ signal	jce :  std_logic_vector(2 downto 1);
 signal	jtdo :  std_logic_vector(2 downto 1);
 signal	jrti :   std_logic_vector(2 downto 1);
 signal  ready : std_logic;
-signal  data : std_logic_vector(47 downto 0);
+signal  cmdin : std_logic_vector(47 downto 0);
 signal  jtag2dec  : std_logic:= '0';
 signal  dec2jtag : std_logic:= '0';
 
@@ -63,31 +60,25 @@ component decoder is
 		SEED_COMMAND  : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', others => '0');
 		RESET_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 1 => '1', others => '0');
 		PARAM_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 2 => '1', others => '0')
-		-- NEXT_COMMAND  : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 2 => '1', 1 => '1', others => '0');
-		-- WAITING 	  : std_logic_vector(7 downto 0) :=  (0 => '0', 7 => '0', others => '1');
-		-- DONE_COMMAND  : std_logic_vector(7 downto 0) :=  (0 => '0', 7 => '0', 1 => '0', others => '1')
 	);
 	port (
---		clk : in std_logic;
 		async_reset : in std_logic;
-		data : in std_logic_vector(47 downto 0) ;
-		-- response : out std_logic_vector (47 downto 0)
-        jtag2dec  : in std_logic  := '0';
-        dec2jtag  : out std_logic := '0';
+		cmdin : in std_logic_vector(47 downto 0) ;
+		
+        jtag2dec  : in std_logic := '0';
+        dec2jtag : out std_logic := '0';
         ready : out std_logic := '1';
-		reset_led : out std_logic := '1';
-		seed_led  : out std_logic := '1';
-		send_led  : out std_logic := '1';
 		delay_led : out std_logic := '1';
-		signals : out std_logic_vector (18 downto 0) := (others => '1')
+		shld_buttons  : out std_logic_vector(12 downto 0);
+		shld_encA    :  out std_logic_vector(1 downto 0);
+		shld_encB    :  out std_logic_vector(1 downto 0);
+		shld_encS    :  out std_logic_vector(1 downto 0)
 	);
 end component;
 
 
 begin
 
---simulation---
---jtdo1 <= jtdo(1);
 	mclr <= '0';	
     JTAGF_inst: JTAGF
 	generic map (
@@ -127,23 +118,23 @@ begin
 		PARAM_COMMAND =>  (0 => '1', 7 => '1', 2 => '1', others => '0')
 	)
 	port map (
---	clk => clk,
+
 	async_reset => reset,
-	data => data,
+	cmdin => cmdin,
 	jtag2dec => jtag2dec,
 	dec2jtag => dec2jtag,
 	ready => ready,
-	reset_led => reset_led,
-	seed_led => seed_led,
-	send_led => send_led,
 	delay_led => delay_led,
-	signals => signals
+	shld_buttons => shld_buttons,
+	shld_encA    => shld_encA,
+	shld_encB    => shld_encB,
+	shld_encS    => shld_encS
 	);
 	
 	
 	
     er1_proc : process(jtck, jce(1))
-    begin
+    begin  
 	
     if falling_edge(jtck) then
         if jrstn = '0' then		-- Test Logic Reset
@@ -196,12 +187,9 @@ begin
 			if jreg(47 downto 41) = "1000001" then
 				jin <= "101010101010101010101010101010101010101010101010";
             end if;
-			--else 
-			--	jin <= "110110110110110110110110110110110110110110110110";
 			end if; 
             if esync2 = '1' and update_r = '1' then
-            --   jin  <= "110101101101100100111111100100111110100111111100"; 
-				data <= jout;
+				cmdin <= jout;
 				jtag2dec_r <= not(jtag2dec_r);
 			end if;
 			

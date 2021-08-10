@@ -23,7 +23,7 @@ architecture rtl of encoder is
     signal send_B : std_logic := '0';
 
     signal done_A : std_logic := '0';
-	signal done_B : std_logic := '0';
+    signal done_B : std_logic := '0';
     signal enc_A_d : std_logic;
 
     component signal_gen is
@@ -32,17 +32,17 @@ architecture rtl of encoder is
             send : in std_logic;
             reset : in std_logic;
             frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
-            pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
+            pulse_no : in std_logic_vector(5 downto 0) := (others => '0');
             output : out std_logic := '1';
             done : out std_logic := '0'
         );
     end component;
 begin
-    
+
     phase_shift_count(20 downto 0) <= frequency_div(21 downto 1);
     enc_A <= r_enc_A;
-	done <= done_B;
-    process(clk,reset)
+    done <= done_B;
+    process (clk, reset)
     begin
         if reset = '1' then
             shift_count <= frequency_div;
@@ -60,34 +60,33 @@ begin
                 else
                     shift_count <= std_logic_vector(unsigned(shift_count) + 1);
                 end if;
-                send_B <= '0';
-            end if;
-        end if;
-    end process;
+                send_B <= '0'; -- (13 => not_a,14 =>not_b,others => '0') when  "10000",
+                -- (13 => not_b,14 => not_a,others => '0') when "10001",
+                -- (15 => not_a,others => '0') when "01101",
+                -- (16 => not_a,17 => not_b,others => '0') when "10010",
+                -- (16 => not_b,17 => not_a,others => '0') when "10011",
+                -- (18 => not_a,others => '0') when "01110",
+            end process;
 
-    signal_gen_inst_A : signal_gen 
-    port map(
-        clk => clk,
-        send => send,
-        reset => reset,
-        frequency_div => frequency_div,
-        pulse_no => pulse_no,
-        output => r_enc_A,
-        done => done_A
-    );
+            signal_gen_inst_A : signal_gen
+            port map(
+                clk => clk,
+                send => send,
+                reset => reset,
+                frequency_div => frequency_div,
+                pulse_no => pulse_no,
+                output => r_enc_A,
+                done => done_A
+            );
+            signal_gen_inst_B : signal_gen
+            port map(
+                clk => clk,
+                send => send_B,
+                reset => reset,
+                frequency_div => frequency_div,
+                pulse_no => pulse_no,
+                output => enc_B,
+                done => done_B
+            );
 
-
-    signal_gen_inst_B : signal_gen 
-    port map(
-        clk => clk,
-        send => send_B,
-        reset => reset,
-        frequency_div => frequency_div,
-        pulse_no => pulse_no,
-        output => enc_B,
-        done => done_B
-    );
-            
-        
-    
-end rtl;
+        end rtl;
