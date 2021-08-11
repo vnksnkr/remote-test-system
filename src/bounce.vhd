@@ -89,6 +89,7 @@ begin
         if reset = '1' then
             STATE <= IDLE;
             clkcnt <= 0;
+
         elsif rising_edge(clk) then
             clkcnt <= clkcnt + 1;
             input_d <= input;
@@ -119,7 +120,6 @@ begin
                 when WAIT_to_LOAD =>
                     state <= BOUNCE;
                 when BOUNCE =>
-
                     if clkcnt >= unsigned(bounce_duration) then
                         STATE <= IDLE;
                         clkcnt <= 0;
