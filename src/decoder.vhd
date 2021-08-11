@@ -212,18 +212,15 @@ begin
 			case STATE is
 				when IDLE =>
 					delay_led <= '1';
-
 					if jtag2dec_sync3 = not(jtag2dec_sync2) then
 						STATE <= DECODE;
 						cmd <= cmdin;
-
 					else
 						STATE <= IDLE;
 					end if;
 
 				when DECODE =>
 					delay_led <= '1';
-
 					if cmd(47 downto 41) = "1000001" then
 						dec2jtag_r <= not(dec2jtag_r);
 						if cmd(7 downto 0) = SEED_COMMAND then
@@ -261,6 +258,7 @@ begin
 						STATE <= SEND;
 						send_signals <= '1';
 					end if;
+
 				when SEND =>
 					delay_led <= '0';
 					if done = '1' then
@@ -290,6 +288,7 @@ begin
 						ready <= '0';
 						STATE <= WAIT_FOR_BOUNCE;
 					end if;
+
 				when RESET =>
 					delay_led <= '1';
 					ready <= '1';
@@ -300,6 +299,7 @@ begin
 					jtag2dec_sync2 <= '0';
 					jtag2dec_sync3 <= '0';
 					STATE <= IDLE;
+					
 				when DELAY =>
 					delay_led <= '1';
 					if delay_count = unsigned(frequency_div) then
