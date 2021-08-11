@@ -20,9 +20,9 @@ class remote:
     P11 = "01010"
     P12 = "01011"
     P13 = "01100"
-    E1_S  = "01101"
-    E2_S =  "01110"
-    E1 =    "10000"
+    E1_S = "01101"
+    E2_S = "01110"
+    E1 = "10000"
     E2 = "10010"
 
     JTAG_CMD = "1000001"
@@ -68,7 +68,7 @@ class remote:
         cmd = self.JTAG_CMD +'0'*20+ seed_s + self.SEED_CMD
         self.jtag.cmdin(h2b("32"),cmd)
 
-    def freq_div(,seldduration):
+    def freq_div(self,duration):
         div = bin(int(round((duration/1000)*2560000)))[2:].zfill(22)
         print(div)
         return div
