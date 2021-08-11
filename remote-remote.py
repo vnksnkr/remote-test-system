@@ -6,6 +6,7 @@ from axiom_jtag import *
 from axiom_mxo2 import *
 import random
 
+
 class remote:
     P1 = "00000"
     P2 = "00001"
@@ -30,17 +31,14 @@ class remote:
     SEED_CMD = "10000001"
     PARAM_CMD = "10000101"
     RCV_CMD = "100"*16
-    
 
-    
-  
-    def __init__(self,bus):
+    def __init__(self, bus):
         self.i2c = SMBus(bus)
         self.jtag = JTag(self.i2c)
         self.def_addr = "00000"
-    
+
     def generate_seed():
-        rand_seed= random.randrange(1,8192)
+        rand_seed = random.randrange(1, 8192)
         return bin(rand_seed)[2:].zfill(13)
 
     def on(self):
@@ -51,63 +49,62 @@ class remote:
 
     def reset(self):
         self.jtag.reset()
-    
+
     def off(self):
         self.jtag.off()
 
     def bounce_off(self):
         seed_s = '0'*13
-        cmd = self.JTAG_CMD +'0'*20+ seed_s +self.SEED_CMD
-        self.jtag.cmdin(h2b("32"),cmd)
+        cmd = self.JTAG_CMD + '0'*20 + seed_s + self.SEED_CMD
+        self.jtag.cmdin(h2b("32"), cmd)
 
-    def loadseed(self,seed=None):
+    def loadseed(self, seed=None):
         if seed == None:
             seed_s = self.generate_seed()
         else:
             seed_s = h2b(seed).zfill(13)
-        cmd = self.JTAG_CMD +'0'*20+ seed_s + self.SEED_CMD
-        self.jtag.cmdin(h2b("32"),cmd)
+        cmd = self.JTAG_CMD + '0'*20 + seed_s + self.SEED_CMD
+        self.jtag.cmdin(h2b("32"), cmd)
 
-    def freq_div(self,duration):
+    def freq_div(self, duration):
         div = bin(int(round((duration/1000)*2560000)))[2:].zfill(22)
         print(div)
         return div
 
-    def select(self,address):
+    def select(self, address):
         self.def_addr = address
 
-    def press(self,address=None,duration=15):
+    def press(self, address=None, duration=15):
         if address == None:
             address = self.def_addr
         if address == self.E1 or address == self.E2:
             print("Selected component is not button")
-            return  0
+            return 0
 
         press_count = bin(1)[2:].zfill(6)
-        cmd = self.JTAG_CMD + press_count + self.freq_div(duration) + address + self.PARAM_CMD
-        self.jtag.cmdin(h2b("32"),cmd)
+        cmd = self.JTAG_CMD + press_count + \
+            self.freq_div(duration) + address + self.PARAM_CMD
+        self.jtag.cmdin(h2b("32"), cmd)
         return 1
 
-
-    def turn(self,address=None,duration=15,ticks=1,counter=False):
+    def turn(self, address=None, duration=15, ticks=1, counter=False):
         if address == None:
             address = self.def_addr
 
         if address != self.E1 and address != self.E2:
             print("Selected component is not encoder")
-            return  0
+            return 0
 
         ticks_s = bin(ticks)[2:].zfill(6)
         if counter == True:
             address = address[:-1] + '1'
-        cmd = self.JTAG_CMD + ticks_s + self.freq_div(duration) + address + self.PARAM_CMD
-        self.jtag.cmdin(h2b("32"),cmd)
+        cmd = self.JTAG_CMD + ticks_s + \
+            self.freq_div(duration) + address + self.PARAM_CMD
+        self.jtag.cmdin(h2b("32"), cmd)
         return 1
 
     def wait(self):
-        cmdrcv = self.jtag.cmdout(h2b("32"),48)
+        cmdrcv = self.jtag.cmdout(h2b("32"), 48)
         while cmdrcv == self.RCV_CMD:
-            cmdrcv = self.jtag.cmdout(h2b("32"),48)
+            cmdrcv = self.jtag.cmdout(h2b("32"), 48)
         return 1
-    
-
