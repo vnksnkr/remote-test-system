@@ -24,7 +24,11 @@ begin
     elsif rising_edge(clk) then
       if gen = '1' then
         currstate <= nextstate;
-      end if;
+	  else
+		currstate <= currstate;
+	  end if;
+	else
+		currstate <= currstate;
     end if;
   end process;
 
