@@ -23,7 +23,7 @@ architecture rtl of encoder is
     signal send_B : std_logic := '0';
 
     signal done_A : std_logic := '0';
-	signal done_B : std_logic := '0';
+    signal done_B : std_logic := '0';
     signal enc_A_d : std_logic;
 
     component signal_gen is
@@ -32,17 +32,17 @@ architecture rtl of encoder is
             send : in std_logic;
             reset : in std_logic;
             frequency_div : in std_logic_vector(21 downto 0) := (others => '0');
-            pulse_no : in std_logic_vector(5 downto 0)  := (others => '0');
+            pulse_no : in std_logic_vector(5 downto 0) := (others => '0');
             output : out std_logic := '1';
             done : out std_logic := '0'
         );
     end component;
 begin
-    
+
     phase_shift_count(20 downto 0) <= frequency_div(21 downto 1);
     enc_A <= r_enc_A;
-	done <= done_B;
-    process(clk,reset)
+    done <= done_B;
+    process (clk, reset)
     begin
         if reset = '1' then
             shift_count <= frequency_div;
@@ -65,7 +65,7 @@ begin
         end if;
     end process;
 
-    signal_gen_inst_A : signal_gen 
+    signal_gen_inst_A : signal_gen
     port map(
         clk => clk,
         send => send,
@@ -75,9 +75,7 @@ begin
         output => r_enc_A,
         done => done_A
     );
-
-
-    signal_gen_inst_B : signal_gen 
+    signal_gen_inst_B : signal_gen
     port map(
         clk => clk,
         send => send_B,
@@ -87,7 +85,5 @@ begin
         output => enc_B,
         done => done_B
     );
-            
-        
-    
+
 end rtl;
