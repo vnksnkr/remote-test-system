@@ -12,7 +12,7 @@ entity top is
 		--	tdi : in std_logic;
 		--	tdo : out std_logic;
 		mclr : out std_logic := '0';
-		delay_led : out std_logic := '1';
+		send_led : out std_logic := '1';
 		shld_buttons : out std_logic_vector(12 downto 0);
 		shld_encA : out std_logic_vector(1 downto 0);
 		shld_encB : out std_logic_vector(1 downto 0);
@@ -60,7 +60,7 @@ architecture struct of top is
 			jtag2dec : in std_logic := '0';
 			dec2jtag : out std_logic := '0';
 			ready : out std_logic := '1';
-			delay_led : out std_logic := '1';
+			send_led : out std_logic := '1';
 			shld_buttons : out std_logic_vector(12 downto 0);
 			shld_encA : out std_logic_vector(1 downto 0);
 			shld_encB : out std_logic_vector(1 downto 0);
@@ -114,7 +114,7 @@ begin
 		jtag2dec => jtag2dec,
 		dec2jtag => dec2jtag,
 		ready => ready,
-		delay_led => delay_led,
+		send_led => send_led,
 		shld_buttons => shld_buttons,
 		shld_encA => shld_encA,
 		shld_encB => shld_encB,

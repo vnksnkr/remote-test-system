@@ -4,7 +4,7 @@ use IEEE.numeric_std.all;
 
 entity demux is
     port (
-        addr : in std_logic_vector(4 downto 0);
+        addr : in std_logic_vector(4 downto 0) := "11111";
         input_A : in std_logic := '1';
         input_B : in std_logic := '1';
         shld_buttons : out std_logic_vector(12 downto 0);
