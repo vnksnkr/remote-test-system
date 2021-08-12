@@ -74,6 +74,9 @@ class remote:
     def select(self, address):
         self.def_addr = address
 
+    def remove_selection(self,address):
+        self.def_addr = "11111"
+
     def press(self, address=None, duration=15):
         if address == None:
             address = self.def_addr
