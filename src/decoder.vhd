@@ -17,7 +17,7 @@ entity decoder is
 		jtag2dec : in std_logic := '0';
 		dec2jtag : out std_logic := '0';
 		ready : out std_logic := '1';
-		delay_led : out std_logic := '1';
+		send_led : out std_logic := '1';
 
 		shld_buttons : out std_logic_vector(12 downto 0);
 		shld_encA : out std_logic_vector(1 downto 0);
@@ -204,14 +204,15 @@ begin
 	begin
 		if async_reset = '0' then
 			STATE <= RESET;
-			delay_led <= '1';
+			send_led <= '1';
+			terminal_addr <= "11111";
 		elsif rising_edge(clk) then
 			jtag2dec_sync1 <= jtag2dec;
 			jtag2dec_sync2 <= jtag2dec_sync1;
 			jtag2dec_sync3 <= jtag2dec_sync2;
 			case STATE is
 				when IDLE =>
-					delay_led <= '1';
+					send_led <= '1';
 					if jtag2dec_sync3 = not(jtag2dec_sync2) then
 						STATE <= DECODE;
 						cmd <= cmdin;
@@ -220,7 +221,7 @@ begin
 					end if;
 
 				when DECODE =>
-					delay_led <= '1';
+					send_led <= '1';
 					if cmd(47 downto 41) = "1000001" then
 						dec2jtag_r <= not(dec2jtag_r);
 						if cmd(7 downto 0) = SEED_COMMAND then
@@ -239,12 +240,12 @@ begin
 					end if;
 
 				when LOAD_SEED =>
-					delay_led <= '1';
+					send_led <= '1';
 					ready <= '1';
 					seed <= cmd(20 downto 8);
 					STATE <= IDLE;
 				when LOAD_PARAM =>
-					delay_led <= '1';
+					send_led <= '1';
 					reset_encoder <= '0';
 					reset_button <= '0';
 					reset_bounce <= '0';
@@ -260,7 +261,7 @@ begin
 					end if;
 
 				when SEND =>
-					delay_led <= '0';
+					send_led <= '0';
 					if done = '1' then
 						STATE <= WAIT_FOR_BOUNCE;
 						reset_encoder <= '1';
@@ -280,7 +281,7 @@ begin
 					end if;
 
 				when WAIT_FOR_BOUNCE =>
-					delay_led <= '0';
+					send_led <= '0';
 					if button_bounce_done = '1' or encB_bounce_done = '1' then
 						ready <= '1';
 						STATE <= IDLE;
@@ -290,7 +291,7 @@ begin
 					end if;
 
 				when RESET =>
-					delay_led <= '1';
+					send_led <= '1';
 					ready <= '1';
 					reset_bounce <= '1';
 					reset_button <= '1';
@@ -301,7 +302,7 @@ begin
 					STATE <= IDLE;
 					
 				when DELAY =>
-					delay_led <= '1';
+					send_led <= '1';
 					if delay_count = unsigned(frequency_div) then
 						STATE <= IDLE;
 						ready <= '1';
