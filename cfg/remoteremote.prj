@@ -2,7 +2,7 @@
 add_file -vhdl -lib work "cae_library/synthesis/vhdl/machxo2.vhd"
 add_file -vhdl -lib work "../src/top.vhd" "../src/decoder.vhd" "../src/demux.vhd" "../src/bounce.vhd" "../src/encoder.vhd" "../src/signalgen.vhd" "../src/pulsegen.vhd" "../src/prng.vhd" 
 
-#add_file -fpga_constraint "../src/machxo2_tim.fdc"
+
 
 #implementation "remoteremote_v1"
 impl -add remoteremote_v1 -type fpga
