@@ -75,10 +75,10 @@ begin
 		ER2 => "ENABLED")
 	port map(
 		---simulation--
-		--		TCK => tck,
-		--	    TMS => tms,
-		--	    TDI => tdi,
-		--	    TDO => tdo,
+		--TCK => tck,
+		--TMS => tms,
+		--TDI => tdi,
+		--TDO => tdo,
 		TCK => '0',
 		TMS => '0',
 		TDI => '0',
