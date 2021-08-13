@@ -5,7 +5,6 @@ library machxo2;
 use machxo2.components.all;
 entity top is
 	port (
-
 		--simulation--
 		--	tck : in std_logic;
 		--	tms : in std_logic;
