@@ -6,10 +6,10 @@ use machxo2.components.all;
 entity top is
 	port (
 		--simulation--
-		--	tck : in std_logic;
-		--	tms : in std_logic;
-		--	tdi : in std_logic;
-		--	tdo : out std_logic;
+		--tck : in std_logic;
+		--tms : in std_logic;
+		--tdi : in std_logic;
+		--tdo : out std_logic;
 		mclr : out std_logic := '0';
 		send_led : out std_logic := '1';
 		shld_buttons : out std_logic_vector(12 downto 0);
