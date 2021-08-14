@@ -10,6 +10,23 @@ To allow for testing the AXIOM Remote, in an automated way, an interface (AXIOM 
 
 ### Building the gateware:
 
+Lattice Diamond needs to be installed for building the gateware. Run the following commands as root.
+
+```
+git clone https://github.com/vnksnkr/remote-test-system.git
+```
+
+```
+cd remote-test-system
+```
+
+Make sure the version of Lattice Diamond specifed in Makefile is the version found in the system
+
+```
+make
+```
+
+The generated bitstream can be found in build/ directory
 
 ### Uploading the bitstream:
 
@@ -19,6 +36,8 @@ To allow for testing the AXIOM Remote, in an automated way, an interface (AXIOM 
 
 * Remove the module before proceeding with the tests:
 
-<code> rmmod rfdev
+```
+rmmod rfdev
+```
 
 ### Using the test framework:
