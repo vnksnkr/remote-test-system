@@ -30,11 +30,11 @@ The generated bitstream can be found in build/ directory
 
 ### Uploading the bitstream:
 
-* There is a driver available to upload the generated bitstream to the  routing fabrics' (MachXO2) SRAM :
+There is a driver available to upload the generated bitstream to the  routing fabrics' (MachXO2) SRAM :
 
-[   https://github.com/Swaraj1998/axiom-beta-rfdev]()
+[https://github.com/Swaraj1998/axiom-beta-rfdev]()
 
-* Remove the module before proceeding with the tests:
+Remove the module before proceeding with the tests:
 
 ```
 rmmod rfdev
