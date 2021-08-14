@@ -282,7 +282,8 @@ begin
 
 				when WAIT_FOR_BOUNCE =>
 					send_led <= '0';
-					if button_bounce_done = '1' or encB_bounce_done = '1' then
+					if (button_bounce_done  = '1' and terminal_addr(4) = '1')   or encB_bounce_done = '1' then
+					--if button_bounce_done = '1' or encB_bounce_done = '1' then
 						ready <= '1';
 						STATE <= IDLE;
 					else
