@@ -5,7 +5,7 @@ To allow for testing the AXIOM Remote, in an automated way, an interface (AXIOM 
 ## Features :
 
 * Automated testing and Real-time Control Support
-* Advanced actions for testing such as bounces, encoder skipping
+* Advanced actions for testing such as button bounces, encoder skipping
 * Easy to use python framework
 
 ## Usage :
