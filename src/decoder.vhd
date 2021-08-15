@@ -243,6 +243,7 @@ begin
 					send_led <= '1';
 					ready <= '1';
 					seed <= cmd(20 downto 8);
+					reset_bounce <= '1';
 					STATE <= IDLE;
 				when LOAD_PARAM =>
 					send_led <= '1';
