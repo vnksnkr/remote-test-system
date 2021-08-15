@@ -47,10 +47,11 @@ class remote:
         self.jtag.sir(h2b("32"))
         self.jtag.idle()
 
-    def reset(self):
+    def reset_jtag(self):
         self.jtag.reset()
 
     def off(self):
+        self.reset()
         self.jtag.off()
 
     def bounce_off(self):
@@ -74,8 +75,13 @@ class remote:
     def select(self, address):
         self.def_addr = address
 
-    def remove_selection(self,address):
+    def remove_selection(self):
         self.def_addr = "11111"
+
+    def reset(self):
+        cmd = self.JTAG_CMD + '0'*33 + self.RESET_CMD
+        self.jtag.cmdin(h2b("32"),cmd)
+        return 1
 
     def press(self, address=None, duration=15):
         if address == None:
@@ -85,8 +91,7 @@ class remote:
             return 0
 
         press_count = bin(1)[2:].zfill(6)
-        cmd = self.JTAG_CMD + press_count + \
-            self.freq_div(duration) + address + self.PARAM_CMD
+        cmd = self.JTAG_CMD + press_count + self.freq_div(duration) + address + self.PARAM_CMD
         self.jtag.cmdin(h2b("32"), cmd)
         return 1
 
@@ -101,13 +106,15 @@ class remote:
         ticks_s = bin(ticks)[2:].zfill(6)
         if counter == True:
             address = address[:-1] + '1'
-        cmd = self.JTAG_CMD + ticks_s + \
-            self.freq_div(duration) + address + self.PARAM_CMD
+        cmd = self.JTAG_CMD + ticks_s + self.freq_div(duration) + address + self.PARAM_CMD
         self.jtag.cmdin(h2b("32"), cmd)
         return 1
+
 
     def wait(self):
         cmdrcv = self.jtag.cmdout(h2b("32"), 48)
         while cmdrcv == self.RCV_CMD:
             cmdrcv = self.jtag.cmdout(h2b("32"), 48)
         return 1
+
+
