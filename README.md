@@ -70,6 +70,7 @@ testremote = remote(2)
   ```
 
   loads a seed value for generating random pulses to simulate button bounces and encoder skips
+  loads a randomly generated seed if no value passed as argument
 * ```
   remote.bounce_off()
   ```
@@ -85,13 +86,13 @@ testremote = remote(2)
   ```
 
   presses the button corresponding to the address passed. Default address is taken if no value passed.
-  The argument duration specifies the time interval between the button press and release.
+  The argument duration(unit = ms) specifies the time interval between the button press and release.
 * ```
   remote.turn(address=None,duration,ticks,counter=False)
   ```
 
   turns the knob corresponding to the address passed. Default address is taken if no value passed.
-  The argument duration specifies the time interval of the each pulse sent from the encoder
+  The argument duration(unit = ms) specifies the time interval of the each pulse sent from the encoder
   The argument ticks specifies the number of turns the encoder makes
   The argument counter, when set to True, turns the encoder in the counter-clockwise direction
 * ```
@@ -115,8 +116,31 @@ testremote = remote(2)
 
   resets the JTAG communication between the 	AXIOM Beta and the remote
 
----
+#### Addresses:
+
+The following addresses can be passed as arguments for the Axiom Remote :
+
+1. Push Buttons : P1 - P13
+2. Encoder : E1,E2
+3. Encoder Buttons : E1_S,E2_S
+
+#### Example Usage:
 
 ```
+from remote_remote import *
 
+testremote = remote(2)
+testremote.on() 						#initiates JTAG connection
+testremote.bounce_off()						#turns off bouncing 
+testremote.press(address=testremote.P13,duration=10) 		#presses Push Button P13 for 10ms
+testremote.wait() 						#waits for acknowledge
+testremote.press(address=testremot.E1_S,duration=10) 		#presses Encoder 1 Button for 10ms
+testremote.wait()
+testremote.turn(address=testremot.E2,ticks=2,duration=15) 	#turns Encoder 2, 2 ticks, each tick having pulse of duration 15ms
+testremote.wait()
+testremote.loadseed()						#loads seed value(generated randomly) to switch on bouncing  
+testremote.press(address=testremot.P2,duration=10)
+testremote.wait()
+testremote.reset() 						#resets the internal logic of the gateware
+testremote.off() 						#closes JTAG connection
 ```
