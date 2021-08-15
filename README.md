@@ -99,7 +99,10 @@ testremote = remote(2)
   remote.wait()
   ```
 
-  waits for the previous instruction to be decoded by the gateware. remote.wait() should always follow remote.press() or remote.turn() while writing automated scripts
+  waits for the previous instruction to be decoded by the gateware.
+
+  > NOTE : remote.wait() should always follow remote.press() or remote.turn() while writing automated scripts
+  >
 * ```
   remote.remove_selection()
   ```
