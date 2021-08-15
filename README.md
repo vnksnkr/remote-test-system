@@ -32,11 +32,11 @@ The generated bitstream can be found in build/ directory
 
 ### Uploading the bitstream:
 
-There is a driver available to upload the generated bitstream to the  routing fabrics' (MachXO2) SRAM :
+There is a driver available to upload the generated bitstream to the  routing fabrics' (MachXO2) SRAM . To upload via the driver follow the instructions at :
 
 [https://github.com/Swaraj1998/axiom-beta-rfdev]()
 
-Remove the module before proceeding with the tests:
+After uploading the bitstream, remove the module before proceeding with the tests as JTAG is needed for communication:
 
 ```
 rmmod rfdev
@@ -88,7 +88,7 @@ testremote = remote(2)
   remote.select(address)
   ```
 
-  sets the default address of the component to be used to 'address'
+  sets the default address of the component to be used, to argument address
 * ```
   remote.press(address,duration)
   ```
@@ -109,7 +109,7 @@ testremote = remote(2)
 
   waits for the previous instruction to be decoded by the gateware.
 
-  > NOTE : remote.wait() should always follow remote.press() or remote.turn() while writing automated scripts
+  > NOTE : remote.wait() should  follow remote.press() or remote.turn() while writing automated scripts
   >
 * ```
   remote.remove_selection()
@@ -142,7 +142,8 @@ from remote_remote import *
 
 testremote = remote(2)
 testremote.on() 						#initiates JTAG connection
-testremote.bounce_off()						#turns off bouncing 
+testremote.bounce_off()						#turns off bouncing
+testremote.wait()					 
 testremote.press(address=testremote.P13,duration=10) 		#presses Push Button P13 for 10ms
 testremote.wait() 						#waits for acknowledge
 testremote.press(address=testremote.E1_S,duration=10) 		#presses Encoder 1 Button for 10ms
@@ -150,6 +151,7 @@ testremote.wait()
 testremote.turn(address=testremote.E2,ticks=2,duration=15) 	#turns Encoder 2, 2 ticks, each tick having pulse of duration 15ms
 testremote.wait()
 testremote.loadseed()						#loads seed value(generated randomly) to switch on bouncing  
+testremote.wait()
 testremote.press(address=testremote.P2,duration=10)
 testremote.wait()
 testremote.reset() 						#resets the internal logic of the gateware
