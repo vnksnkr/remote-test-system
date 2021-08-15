@@ -69,7 +69,6 @@ class remote:
 
     def freq_div(self, duration):
         div = bin(int(round((duration/1000)*2560000)))[2:].zfill(22)
-        print(div)
         return div
 
     def select(self, address):
@@ -91,6 +90,7 @@ class remote:
             return 0
 
         press_count = bin(1)[2:].zfill(6)
+        print("pressing button ",address)
         cmd = self.JTAG_CMD + press_count + self.freq_div(duration) + address + self.PARAM_CMD
         self.jtag.cmdin(h2b("32"), cmd)
         return 1
@@ -105,7 +105,9 @@ class remote:
 
         ticks_s = bin(ticks)[2:].zfill(6)
         if counter == True:
-            address = address[:-1] + '1'
+            address = address[:-1] + "1"
+
+        print("turning encoder ",address)
         cmd = self.JTAG_CMD + ticks_s + self.freq_div(duration) + address + self.PARAM_CMD
         self.jtag.cmdin(h2b("32"), cmd)
         return 1
