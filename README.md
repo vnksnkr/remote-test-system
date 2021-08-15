@@ -54,7 +54,7 @@ python -i remote_remote.py
 
 #### class remote
 
-remote implements the testing framework for the AXIOM Remote. At the lower level it uses a JTAG Interface to use the internal JTAG access on the MachXO2 for communication.
+**remote** implements the testing framework for the AXIOM Remote. At the lower level it uses a JTAG Interface to use the internal JTAG access on the MachXO2 for communication.
 
 remote objects can be initialized using :
 
@@ -77,7 +77,7 @@ testremote = remote(2)
   remote.loadseed(seed=None)
   ```
 
-  loads a seed value for generating random pulses to simulate button bounces and encoder skips
+  loads a **seed** value for generating random pulses to simulate button bounces and encoder skips
   loads a randomly generated seed if no value passed as argument
 * ```
   remote.bounce_off()
@@ -88,21 +88,21 @@ testremote = remote(2)
   remote.select(address)
   ```
 
-  sets the default address of the component to be used, to argument address
+  sets the default address of the component to be used, to argument **address**
 * ```
   remote.press(address,duration)
   ```
 
   presses the button corresponding to the address passed. Default address is taken if no value passed.
-  The argument duration(unit = ms) specifies the time interval between the button press and release.
+  The argument **duration**(unit = ms) specifies the time interval between the button press and release.
 * ```
   remote.turn(address=None,duration,ticks,counter=False)
   ```
 
   turns the knob corresponding to the address passed. Default address is taken if no value passed.
-  The argument duration(unit = ms) specifies the time interval of the each pulse sent from the encoder
-  The argument ticks specifies the number of turns the encoder makes
-  The argument counter, when set to True, turns the encoder in the counter-clockwise direction
+  The argument **duration**(unit = ms) specifies the time interval of the each pulse sent from the encoder
+  The argument **ticks** specifies the number of turns the encoder makes
+  The argument **counter**, when set to True, turns the encoder in the counter-clockwise direction
 * ```
   remote.wait()
   ```
@@ -125,7 +125,7 @@ testremote = remote(2)
   remote.reset_jtag()
   ```
 
-  resets the JTAG communication between the 	AXIOM Beta and the remote
+  resets the JTAG communication between the 	AXIOM Beta and the Remote
 
 #### Addresses:
 
