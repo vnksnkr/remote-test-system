@@ -44,6 +44,14 @@ rmmod rfdev
 
 ### Using the test framework:
 
+The framework can be used to run automated scripts for testing purposes . An example is provided at the bottom.
+
+It can also be used to control the remote in real time from the Axiom Beta by running it in interactive mode :
+
+```
+python -i remote_remote.py
+```
+
 #### class remote
 
 remote implements the testing framework for the AXIOM Remote. At the lower level it uses a JTAG Interface to use the internal JTAG access on the MachXO2 for communication.
