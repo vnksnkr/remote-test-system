@@ -34,7 +34,7 @@ The generated bitstream can be found in build/ directory
 
 There is a driver available to upload the generated bitstream to the  routing fabrics' (MachXO2) SRAM . To upload via the driver follow the instructions at :
 
-[https://github.com/vnksnkr/axiom-beta-rfdev]()
+[https://github.com/Swaraj1998/axiom-beta-rfdev]()
 
 After uploading the bitstream, remove the module before proceeding with the tests as JTAG is needed for communication:
 
