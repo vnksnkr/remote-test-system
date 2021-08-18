@@ -23,21 +23,21 @@ class remote:
     P13 = "01100"
     E1_S = "01101"
     E2_S = "01110"
-    E1 = "10000"
-    E2 = "10010"
+    E1 = "10010"
+    E2 = "10000"
 
-    JTAG_CMD = "1000001"
-    RESET_CMD = "10000011"
-    SEED_CMD = "10000001"
-    PARAM_CMD = "10000101"
-    RCV_CMD = "100"*16
+    POLL_CMD = "10001"
+    RESET_CMD = "10100"
+    SEED_CMD = "10011"
+    PARAM_CMD = "10101"
+    RCV_CMD = "10"*19
 
     def __init__(self, bus):
         self.i2c = SMBus(bus)
         self.jtag = JTag(self.i2c)
         self.def_addr = "00000"
 
-    def generate_seed():
+    def generate_seed(self):
         rand_seed = random.randrange(1, 8192)
         return bin(rand_seed)[2:].zfill(13)
 
@@ -56,16 +56,20 @@ class remote:
 
     def bounce_off(self):
         seed_s = '0'*13
-        cmd = self.JTAG_CMD + '0'*20 + seed_s + self.SEED_CMD
-        self.jtag.cmdin(h2b("32"), cmd)
+        cmd = '0'*20 + seed_s + self.SEED_CMD
+        status = self.jtag.cmdshift(h2b("32"),cmd)
+        return status
+
 
     def loadseed(self, seed=None):
         if seed == None:
             seed_s = self.generate_seed()
         else:
             seed_s = h2b(seed).zfill(13)
-        cmd = self.JTAG_CMD + '0'*20 + seed_s + self.SEED_CMD
-        self.jtag.cmdin(h2b("32"), cmd)
+        cmd = '0'*20+ seed_s + self.SEED_CMD
+        status = self.jtag.cmdshift(h2b("32"),cmd)
+        return(status)
+
 
     def freq_div(self, duration):
         div = bin(int(round((duration/1000)*2560000)))[2:].zfill(22)
@@ -78,8 +82,8 @@ class remote:
         self.def_addr = "11111"
 
     def reset(self):
-        cmd = self.JTAG_CMD + '0'*33 + self.RESET_CMD
-        self.jtag.cmdin(h2b("32"),cmd)
+        cmd = '0'*33 + self.RESET_CMD
+        self.jtag.cmdin(h2b("32"), cmd)
         return 1
 
     def press(self, address=None, duration=15):
@@ -90,10 +94,10 @@ class remote:
             return 0
 
         press_count = bin(1)[2:].zfill(6)
-        print("pressing button ",address)
-        cmd = self.JTAG_CMD + press_count + self.freq_div(duration) + address + self.PARAM_CMD
-        self.jtag.cmdin(h2b("32"), cmd)
+        cmd = press_count + self.freq_div(duration) + address + self.PARAM_CMD
+        status = self.jtag.cmdshift(h2b("32"),cmd)
         return 1
+
 
     def turn(self, address=None, duration=15, ticks=1, counter=False):
         if address == None:
@@ -107,16 +111,23 @@ class remote:
         if counter == True:
             address = address[:-1] + "1"
 
-        print("turning encoder ",address)
-        cmd = self.JTAG_CMD + ticks_s + self.freq_div(duration) + address + self.PARAM_CMD
-        self.jtag.cmdin(h2b("32"), cmd)
+        print("turning encoder ", address)
+        cmd = ticks_s + self.freq_div(duration) + address + self.PARAM_CMD
+        status = self.jtag.cmdshift(h2b("32"),cmd)
         return 1
+
+    def poll(self):
+        cmdrcv = self.jtag.cmdshift(h2b("32"),'0'*33 + self.POLL_CMD)
+        if cmdrcv == self.RCV_CMD:
+            print("No ongoing operation")
+        else:
+            print("Busy")
+        return cmdrcv
 
 
     def wait(self):
-        cmdrcv = self.jtag.cmdout(h2b("32"), 48)
-        while cmdrcv == self.RCV_CMD:
-            cmdrcv = self.jtag.cmdout(h2b("32"), 48)
+        cmdrcv = self.poll()
+        while cmdrcv != self.RCV_CMD:
+            cmdrcv = self.poll()
         return 1
-
 

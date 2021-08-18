@@ -6,13 +6,13 @@ use machxo2.all;
 
 entity decoder is
 	generic (
-		SEED_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', others => '0');
-		RESET_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 1 => '1', others => '0');
-		PARAM_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 2 => '1', others => '0')
+		SEED_COMMAND  : std_logic_vector(4 downto 0) := "10011";
+		RESET_COMMAND : std_logic_vector(4 downto 0) := "10100";
+		PARAM_COMMAND : std_logic_vector(4 downto 0) := "10101"
 	);
 	port (
 		async_reset : in std_logic;
-		cmdin : in std_logic_vector(47 downto 0);
+		cmdin : in std_logic_vector(37 downto 0);
 
 		jtag2dec : in std_logic := '0';
 		dec2jtag : out std_logic := '0';
@@ -29,7 +29,7 @@ end entity;
 
 architecture rtl of decoder is
 
-	signal cmd : std_logic_vector(47 downto 0);
+	signal cmd : std_logic_vector(37 downto 0);
 	signal seed : std_logic_vector(12 downto 0);
 
 	--output control--
@@ -222,27 +222,24 @@ begin
 
 				when DECODE =>
 					send_led <= '1';
-					if cmd(47 downto 41) = "1000001" then
-						dec2jtag_r <= not(dec2jtag_r);
-						if cmd(7 downto 0) = SEED_COMMAND then
-							STATE <= LOAD_SEED;
-							ready <= '0';
-						elsif cmd(7 downto 0) = RESET_COMMAND then
-							STATE <= RESET;
-							ready <= '0';
-						elsif cmd(7 downto 0) = PARAM_COMMAND then
-							STATE <= LOAD_PARAM;
-							ready <= '0';
-						else
-							STATE <= IDLE;
-						end if;
+					dec2jtag_r <= not(dec2jtag_r);
+					if cmd(4 downto 0) = SEED_COMMAND then
+						STATE <= LOAD_SEED;
+						ready <= '0';
+					elsif cmd(4 downto 0) = RESET_COMMAND then
+						STATE <= RESET;
+						ready <= '0';
+					elsif cmd(4 downto 0) = PARAM_COMMAND then
+						STATE <= LOAD_PARAM;
+						ready <= '0';
 					else
+						STATE <= IDLE;
 					end if;
 
 				when LOAD_SEED =>
 					send_led <= '1';
 					ready <= '1';
-					seed <= cmd(20 downto 8);
+					seed <= cmd(17 downto 5);
 					reset_bounce <= '1';
 					STATE <= IDLE;
 				when LOAD_PARAM =>
@@ -250,10 +247,10 @@ begin
 					reset_encoder <= '0';
 					reset_button <= '0';
 					reset_bounce <= '0';
-					terminal_addr <= cmd(12 downto 8);
-					frequency_div <= cmd(34 downto 13);
-					pulse_no <= cmd(40 downto 35);
-					if cmd(40 downto 35) = "000000" then
+					terminal_addr <= cmd(9 downto 5);
+					frequency_div <= cmd(31 downto 10);
+					pulse_no <= cmd(37 downto 32);
+					if cmd(37 downto 32) = "000000" then
 						STATE <= DELAY;
 						delay_count <= 0;
 					else

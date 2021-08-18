@@ -4,6 +4,10 @@ use IEEE.numeric_std.all;
 library machxo2;
 use machxo2.components.all;
 entity top is
+	generic (
+		NOP  : std_logic_vector(37 downto 0) := "10101010101010101010101010101010101010";
+		BUSY : std_logic_vector(37 downto 0) :=  "11111010101010101010101010101010101111"
+	);
 	port (
 		--simulation--
 		--tck : in std_logic;
@@ -31,11 +35,11 @@ architecture struct of top is
 	signal jtdo : std_logic_vector(2 downto 1);
 	signal jrti : std_logic_vector(2 downto 1);
 	signal ready : std_logic;
-	signal cmdin : std_logic_vector(47 downto 0);
+	signal cmdin : std_logic_vector(37 downto 0);
 	signal jtag2dec : std_logic := '0';
 	signal dec2jtag : std_logic := '0';
 
-	signal jreg : std_logic_vector(47 downto 0);
+	signal jreg : std_logic_vector(37 downto 0);
 	signal jin : std_logic_vector(jreg'range) := (others => '0');
 	signal jout : std_logic_vector(jreg'range);
 
@@ -48,13 +52,13 @@ architecture struct of top is
 	signal esync2 : std_logic := '0';
 	component decoder is
 		generic (
-			SEED_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', others => '0');
-			RESET_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 1 => '1', others => '0');
-			PARAM_COMMAND : std_logic_vector(7 downto 0) := (0 => '1', 7 => '1', 2 => '1', others => '0')
+		SEED_COMMAND  : std_logic_vector(4 downto 0) := "10011";
+		RESET_COMMAND : std_logic_vector(4 downto 0) := "10100";
+		PARAM_COMMAND : std_logic_vector(4 downto 0) := "10101"
 		);
 		port (
 			async_reset : in std_logic;
-			cmdin : in std_logic_vector(47 downto 0);
+			cmdin : in std_logic_vector(37 downto 0);
 
 			jtag2dec : in std_logic := '0';
 			dec2jtag : out std_logic := '0';
@@ -102,9 +106,9 @@ begin
 
 	decoderinst : decoder
 	generic map(
-		SEED_COMMAND => (0 => '1', 7 => '1', others => '0'),
-		RESET_COMMAND => (0 => '1', 7 => '1', 1 => '1', others => '0'),
-		PARAM_COMMAND => (0 => '1', 7 => '1', 2 => '1', others => '0')
+		SEED_COMMAND  => "10011",
+		RESET_COMMAND => "10100",
+		PARAM_COMMAND => "10101"
 	)
 	port map(
 
@@ -134,9 +138,11 @@ begin
 				end if;
 
 			elsif jupdate = '1' then
-				if jreg(47 downto 41) = "1000001" then
-					jout <= jreg;
-				end if;
+				if jreg(4 downto 0) = "10001" then
+		
+					else
+						jout <= jreg;
+					end if;
 			elsif jrti(1) = '1' then -- Run Test/Idle
 				reset <= '1';
 			else -- Last Bit
@@ -167,10 +173,12 @@ begin
 				update_r <= '0';
 			end if;
 			if jsync_d = not(jsync2) then
-				jin <= "100100100100100100100100100100100100100100100100";
+				jin <= NOP;
 			elsif jupdate = '1' then
-				if jreg(47 downto 41) = "1000001" then
-					jin <= "101010101010101010101010101010101010101010101010";
+				if jreg(4 downto 0) = "10001" then
+
+				else
+					jin <= BUSY;
 				end if;
 			end if;
 			if esync2 = '1' and update_r = '1' then
@@ -181,7 +189,9 @@ begin
 			if esync2 = '1' and update_r = '1' then
 				update_r <= '0';
 			elsif jupdate = '1' then
-				if jreg(47 downto 41) = "1000001" then
+				if jreg(4 downto 0) = "10001" then
+
+				else
 					update_r <= '1';
 				end if;
 			end if;
