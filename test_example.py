@@ -10,6 +10,7 @@ testremote.wait()
 testremote.turn(address=testremote.E2,ticks=2,duration=15)  #turns Encoder 2, 2 ticks, each tick having pulse of duration 15ms
 testremote.wait()
 testremote.loadseed()                                       #loads seed value(generated randomly) to switch on bouncing  
+testremote.wait()
 testremote.press(address=testremote.P2,duration=10)
 testremote.wait()
 testremote.reset()                                          #resets the internal logic of the gateware
