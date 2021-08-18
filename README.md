@@ -103,6 +103,11 @@ testremote = remote(2)
   The argument **ticks** specifies the number of turns the encoder makes
   The argument **counter**, when set to True, turns the encoder in the counter-clockwise direction
 * ```
+  remote.poll()
+  ```
+
+  returns the current state of the gateware ( i.e busy or idle)
+* ```
   remote.wait()
   ```
 
