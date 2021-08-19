@@ -1,3 +1,8 @@
+#!/bin/env python3
+
+# Copyright (C) 2021 Vinayak Sankar
+
+
 import sys
 
 from smbus import SMBus

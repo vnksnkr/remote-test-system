@@ -1,3 +1,17 @@
+----------------------------------------------------------------------------
+--  decoder.vhd
+--	Instruction Decoder for Remote Test System
+--
+--  Copyright (C) Vinayak Sankar
+--
+--	This program is free software: you can redistribute it and/or
+--	modify it under the terms of the GNU General Public License
+--	as published by the Free Software Foundation, either version
+--	3 of the License, or (at your option) any later version.
+--
+----------------------------------------------------------------------------
+
+
 library ieee;
 use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;

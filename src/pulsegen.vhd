@@ -1,3 +1,16 @@
+----------------------------------------------------------------------------
+--  pulsegen.vhd
+--	Programmable Pulse Generator
+--
+--  Copyright (C) Vinayak Sankar
+--
+--	This program is free software: you can redistribute it and/or
+--	modify it under the terms of the GNU General Public License
+--	as published by the Free Software Foundation, either version
+--	3 of the License, or (at your option) any later version.
+--
+----------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
