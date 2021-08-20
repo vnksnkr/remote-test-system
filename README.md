@@ -71,34 +71,33 @@ testremote = remote(2)
   remote.on()
   ```
 
-  sets up communication between the gateware that controls the remote, and the AXIOM Beta
+  Sets up communication between the gateware that controls the remote, and the AXIOM Beta
 * ```
   remote.loadseed(seed=None)
   ```
 
-  loads a **seed** value for generating random pulses to simulate button bounces and encoder skips
-  loads a randomly generated seed if no value passed as argument
+  Loads a **seed** value for generating random pulses to simulate button bounces and encoder skips.Loads a randomly generated seed if no value passed as argument
 * ```
   remote.bounce_off()
   ```
 
-  turns off the bouncing
+  Turns off the bouncing
 * ```
   remote.select(address)
   ```
 
-  sets the default address of the component to be used, to argument **address**
+  Sets the default address of the component to be used, to argument **address**
 * ```
   remote.press(address,duration)
   ```
 
-  presses the button corresponding to the address passed. Default address is taken if no value passed.
+  Presses the button corresponding to the address passed. Default address is taken if no value passed.
   The argument **duration**(unit = ms) specifies the time interval between the button press and release.
 * ```
   remote.turn(address=None,duration,ticks,counter=False)
   ```
 
-  turns the knob corresponding to the address passed. Default address is taken if no value passed.
+  Turns the knob corresponding to the address passed. Default address is taken if no value passed.
   The argument **duration**(unit = ms) specifies the time interval of the each pulse sent from the encoder
   The argument **ticks** specifies the number of turns the encoder makes
   The argument **counter**, when set to True, turns the encoder in the counter-clockwise direction
@@ -106,12 +105,12 @@ testremote = remote(2)
   remote.poll()
   ```
 
-  returns the current state of the gateware ( i.e busy or idle)
+  Returns the current state of the gateware ( i.e busy or idle)
 * ```
   remote.wait()
   ```
 
-  waits for the previous instruction to be decoded by the gateware.
+  Waits for the previous instruction to be decoded by the gateware.
 
   > NOTE : remote.wait() should  follow remote.press() or remote.turn() while writing automated scripts
   >
@@ -119,17 +118,17 @@ testremote = remote(2)
   remote.remove_selection()
   ```
 
-  clears the default address of the component
+  Clears the default address of the component
 * ```
   remote.reset()
   ```
 
-  resets the internal state of the gateware
+  Resets the internal state of the gateware
 * ```
   remote.reset_jtag()
   ```
 
-  resets the JTAG communication between the 	AXIOM Beta and the Remote
+  Resets the JTAG communication between the 	AXIOM Beta and the Remote
 
 #### Addresses:
 
