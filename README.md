@@ -77,7 +77,6 @@ testremote = remote(2)
   ```
 
   loads a **seed** value for generating random pulses to simulate button bounces and encoder skips
-  
   loads a randomly generated seed if no value passed as argument
 * ```
   remote.bounce_off()
