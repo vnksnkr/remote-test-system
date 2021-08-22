@@ -36,6 +36,7 @@ class remote:
     SEED_CMD = "10011"
     PARAM_CMD = "10101"
     RCV_CMD = "10"*19
+    JTAGOFF_CMD = "1"*38
 
     def __init__(self, bus):
         self.i2c = SMBus(bus)
@@ -57,6 +58,7 @@ class remote:
 
     def off(self):
         self.reset()
+        self.wait()
         self.jtag.off()
 
     def bounce_off(self):
@@ -121,18 +123,21 @@ class remote:
         status = self.jtag.cmdshift(h2b("32"),cmd)
         return 1
 
-    def poll(self):
+    def poll(self,resp=True):
         cmdrcv = self.jtag.cmdshift(h2b("32"),'0'*33 + self.POLL_CMD)
-        if cmdrcv == self.RCV_CMD:
-            print("No ongoing operation")
-        else:
-            print("Busy")
+        if resp == True:
+            if cmdrcv == self.RCV_CMD:
+                print("No ongoing operation, no instruction in queue")
+            elif cmdrcv == self.JTAGOFF_CMD:
+                print("JTAG OFF")
+            else:
+                print("Busy, instruction in queue")
         return cmdrcv
 
 
-    def wait(self):
-        cmdrcv = self.poll()
-        while cmdrcv != self.RCV_CMD:
-            cmdrcv = self.poll()
+    def wait(self,resp=False):
+        cmdrcv = self.poll(resp)
+        while cmdrcv != self.RCV_CMD and cmdrcv != self.JTAGOFF_CMD:
+            cmdrcv = self.poll(resp)
         return 1
 
