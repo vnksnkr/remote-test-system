@@ -40,6 +40,8 @@ end top;
 architecture struct of top is
 
 	signal reset : std_logic;
+
+	--JTAGF internal pins--
 	signal jtdi : std_logic;
 	signal jtck : std_logic;
 	signal jshift : std_logic;
@@ -48,15 +50,21 @@ architecture struct of top is
 	signal jce : std_logic_vector(2 downto 1);
 	signal jtdo : std_logic_vector(2 downto 1);
 	signal jrti : std_logic_vector(2 downto 1);
+
+
 	signal ready : std_logic;
 	signal cmdin : std_logic_vector(37 downto 0);
+
+	--toggle signals--
 	signal jtag2dec : std_logic := '0';
 	signal dec2jtag : std_logic := '0';
+
 
 	signal jreg : std_logic_vector(37 downto 0);
 	signal jin : std_logic_vector(jreg'range) := (others => '0');
 	signal jout : std_logic_vector(jreg'range);
 
+	--synchronizers--
 	signal update_r : std_logic := '0';
 	signal jtag2dec_r : std_logic := '0';
 	signal jsync1 : std_logic := '0';
@@ -64,6 +72,7 @@ architecture struct of top is
 	signal jsync_d : std_logic := '0';
 	signal esync1 : std_logic := '0';
 	signal esync2 : std_logic := '0';
+
 	component decoder is
 		generic (
 		SEED_COMMAND  : std_logic_vector(4 downto 0) := "10011";
@@ -189,7 +198,7 @@ begin
 			if jsync_d = not(jsync2) then
 				jin <= NOP;
 			elsif jupdate = '1' then
-				if jreg(4 downto 0) = "10001" then
+				if jreg(4 downto 0) = "10001" then -- POLL
 
 				else
 					jin <= BUSY;

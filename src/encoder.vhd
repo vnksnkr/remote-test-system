@@ -29,15 +29,18 @@ entity encoder is
 end entity;
 
 architecture rtl of encoder is
+
     signal shift_count : std_logic_vector(21 downto 0);
     signal phase_shift_count : std_logic_vector(21 downto 0) := (others => '0');
+    
     signal r_enc_A : std_logic := '1';
     signal r_enc_B : std_logic := '1';
-    signal send_B : std_logic := '0';
+    signal enc_A_d : std_logic;
 
+    signal send_B : std_logic := '0';
     signal done_A : std_logic := '0';
     signal done_B : std_logic := '0';
-    signal enc_A_d : std_logic;
+    
 
     component signal_gen is
         port (

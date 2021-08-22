@@ -27,6 +27,7 @@ entity pulse_gen is
 end entity pulse_gen;
 
 architecture rtl of pulse_gen is
+    
     signal length_c : std_logic_vector (7 downto 0) := (others => '0');
     signal max_length : std_logic_vector (7 downto 0) := (others => '0');
     signal max_delay : std_logic_vector (7 downto 0) := (others => '0');

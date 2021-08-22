@@ -48,6 +48,7 @@ architecture rtl of decoder is
 
 	--output control--
 	signal terminal_addr : std_logic_vector (4 downto 0);
+
 	--signalgen and encoder--
 	signal send_signals : std_logic := '0';
 	signal push_button : std_logic := '0';
@@ -237,7 +238,7 @@ begin
 				when DECODE =>
 					send_led <= '1';
 					dec2jtag_r <= not(dec2jtag_r);
-					if cmd(4 downto 0) = SEED_COMMAND then
+					if cmd(4 downto 0) = SEED_COMMAND then 
 						STATE <= LOAD_SEED;
 						ready <= '0';
 					elsif cmd(4 downto 0) = RESET_COMMAND then
