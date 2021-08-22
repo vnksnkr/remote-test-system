@@ -103,9 +103,11 @@ testremote = remote(2)
   The argument **counter**, when set to True, turns the encoder in the counter-clockwise direction
 * ```
   remote.poll()
+
+
   ```
 
-  Returns the current state of the gateware ( i.e busy or idle)
+  Checks whether an instruction is in queue to be decoded and executed.
 * ```
   remote.wait()
   ```
