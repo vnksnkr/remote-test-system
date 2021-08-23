@@ -28,7 +28,7 @@ Make sure the version of Lattice Diamond specifed in Makefile is the version fou
 make
 ```
 
-The generated bitstream can be found in build/ directory
+The generated bitstream, remoteremote.bit, can be found in build/ directory
 
 ### Uploading the bitstream:
 
@@ -103,8 +103,6 @@ testremote = remote(2)
   The argument **counter**, when set to True, turns the encoder in the counter-clockwise direction
 * ```
   remote.poll()
-
-
   ```
 
   Checks whether an instruction is in queue to be decoded and executed.
